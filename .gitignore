@@ -1,0 +1,8 @@
+.venv/
+.DS*
+test/
+__pycache__
+
+config.py
+a.html
+test*
