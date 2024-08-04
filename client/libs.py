@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from config import COOKIE
+from logs import logger
 
 
 url = "https://pt.keepfrds.com/blackjack.php"
@@ -28,41 +29,67 @@ def parse_form_from_html(soup):
 
 
 def find_game(userid):
-    with requests.get(url, headers=headers) as response:
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "lxml")
-            forms = soup.select("#game_available tr td:nth-of-type(4) form")
-            for form in forms:
-                if form.find("input", value=str(userid)):
-                    return parse_form_from_html(form)
-        else:
-            raise (response.status_code)
+    error = 0
+    while error < 3:
+        try:
+            with requests.get(url, headers=headers) as response:
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, "lxml")
+                    forms = soup.select(
+                        "#game_available tr td:nth-of-type(4) form")
+                    for form in forms:
+                        if form.find("input", value=str(userid)):
+                            return parse_form_from_html(form)
+                else:
+                    raise (response.status_code)
+        except:
+            error += 1
+            logger.error(f"请求错误{error}次")
+
 
 
 def my_game_state():
-    with requests.get(url, headers=headers) as response:
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "lxml")
-            forms = soup.select("#details tr")
-            if forms and forms[-1].text.strip() == "请等待上局结束":
-                return forms[-1].text.strip()
-            return None
-        else:
-            raise (response.status_code)
+    error = 0
+    while error < 3:
+        try:
+            with requests.get(url, headers=headers) as response:
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, "lxml")
+                    forms = soup.select("#details tr")
+                    if forms and forms[-1].text.strip() == "请等待上局结束":
+                        return True
+                    return None
+                else:
+                    raise (response.status_code)
+        except:
+            error += 1
+            logger.error(f"请求错误{error}次")
+
 
 
 def game(data):
-    with requests.post(url, headers=headers, data=data) as response:
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "lxml")
-            with open("a.html", "w") as f:
-                f.write(response.text)
-            element = soup.select_one("#details b")
-            if element:
-                text = element.get_text(strip=True)
-                return int(text.split("=")[-1])
-        else:
-            raise (response.status_code)
+    error = 0
+    while error < 3:
+        try:
+            with requests.post(url, headers=headers, data=data) as response:
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, "lxml")
+                    element = soup.select_one("#details b")
+                    if element:
+                        text = element.get_text(strip=True)
+                        try:
+                            point = int(text.split("=")[-1])
+                        except:
+                            point = 0
+                        return point
+                    else:
+                        error += 1
+                        logger.error(f"未获取到点数，请求错误{error}次")
+                else:
+                    raise (response.status_code)
+        except:
+            error += 1
+            logger.error(f"请求错误{error}次")
 
 
 def boom_game(userid, my_userid=40074):
@@ -70,22 +97,25 @@ def boom_game(userid, my_userid=40074):
     continue_data = {"game": "hit", "continue": "yes", "userid": my_userid}
     hit_data = {"game": "hit", "userid": my_userid}
     stop_data = {"game": "stop", "userid": my_userid}
+    if not start_data:
+        return 0
     s = game(start_data)
     if not s:
         s = game(continue_data)
     while s < 21:
-        print(f"当前点数{s}，继续抓牌")
+        logger.info(f"当前点数{s}，继续抓牌")
         s = game(hit_data)
     if s == 21:
-        print(f"当前点数{s}，平局失败")
+        logger.info(f"当前点数{s}，平局失败")
         return s
     else:
-        print(f"当前点数{s}，平局成功")
+        logger.info(f"当前点数{s}，平局成功")
         return s
 
 
 def do_game(amount=100):
-    start_data = {"game": "hit", "start": "yes", "amount": amount, "downloads": 0}
+    start_data = {"game": "hit", "start": "yes",
+                  "amount": amount, "downloads": 0}
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
@@ -93,16 +123,16 @@ def do_game(amount=100):
     if not s:
         s = game(continue_data)
     if not s:
-        print("上一场未结束")
+        logger.info("上一场未结束")
         return
     while s < 20:
-        print(f"当前点数{s}，继续抓牌")
+        logger.info(f"当前点数{s}，继续抓牌")
         s = game(hit_data)
     if s == 21:
-        print(f"当前点数{s}，完美")
+        logger.info(f"当前点数{s}，完美")
     elif s == 20:
-        print(f"当前点数{s}，停止抓牌")
+        logger.info(f"当前点数{s}，停止抓牌")
         return game(stop_data)
     else:
-        print(f"当前点数{s}，爆了")
+        logger.info(f"当前点数{s}，爆了")
     return s

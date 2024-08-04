@@ -1,0 +1,10 @@
+#!/bin/bash
+REPO_DIR="/client"
+cd $REPO_DIR
+echo starting
+pip install --upgrade pip -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com >/dev/null 2>&1
+echo "pip updated"
+pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade >/dev/null 2>&1
+echo "requirements updated"
+
+python -u run.py
