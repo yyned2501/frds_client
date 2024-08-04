@@ -40,6 +40,7 @@ def find_game(userid):
                     for form in forms:
                         if form.find("input", value=str(userid)):
                             return parse_form_from_html(form)
+                    return None
                 else:
                     raise (response.status_code)
         except:
@@ -57,7 +58,7 @@ def my_game_state():
                     soup = BeautifulSoup(response.text, "lxml")
                     forms = soup.select("#details tr")
                     if forms and forms[-1].text.strip() == "请等待上局结束":
-                        return True
+                        return 1
                     return None
                 else:
                     raise (response.status_code)
@@ -90,6 +91,7 @@ def game(data):
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+    return 22
 
 
 def boom_game(userid, my_userid=40074):
@@ -98,18 +100,20 @@ def boom_game(userid, my_userid=40074):
     hit_data = {"game": "hit", "userid": my_userid}
     stop_data = {"game": "stop", "userid": my_userid}
     if not start_data:
-        return 0
-    s = game(start_data)
+        logger.warn(f"平局：对局已结束")
+        return None
+    s = game(start_data) or game(continue_data)
     if not s:
-        s = game(continue_data)
+        logger.warn(f"平局：对局被人抢了")
+        return None
     while s < 21:
-        logger.info(f"当前点数{s}，继续抓牌")
+        logger.info(f"平局：当前点数{s}，继续抓牌")
         s = game(hit_data)
     if s == 21:
-        logger.info(f"当前点数{s}，平局失败")
+        logger.info(f"平局：当前点数{s}，平局失败")
         return s
     else:
-        logger.info(f"当前点数{s}，平局成功")
+        logger.info(f"平局：当前点数{s}，平局成功")
         return s
 
 
