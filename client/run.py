@@ -19,7 +19,7 @@ def get_boomid(res_data):
             str(res_data[k].get("boomid", 0)) for k in res_data if int(k) != USERID
         ]
         for k in res_data:
-            if int(k) != USERID and int(k) not in friend_boom_list:
+            if (int(k) != USERID) and (int(k) not in friend_boom_list):
                 d: dict = res_data[k]
                 if not d.get("state", None):
                     return int(k)

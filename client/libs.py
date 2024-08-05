@@ -84,8 +84,7 @@ def game(data):
                             point = 0
                         return point
                     else:
-                        error += 1
-                        logger.error(f"未获取到点数，请求错误{error}次")
+                        return 22
                 else:
                     raise (response.status_code)
         except:
