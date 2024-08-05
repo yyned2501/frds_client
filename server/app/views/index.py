@@ -1,12 +1,14 @@
+import datetime
 from app.init import app
 from flask import request, jsonify
 import time
+
 states = {}
 
 
 def delete_old_states():
     for k in states:
-        if time.time()-states[k]["next_time"] > 20:
+        if time.time() - states[k]["next_time"] > 20:
             del states[k]
 
 
@@ -19,6 +21,9 @@ def index():
             state[k] = int(v)
         except ValueError:
             state[k] = v
+    if "sleep" in state:
+        state["next_time"] = time.time() + state["sleep"]
+    state["next_date"] = datetime.datetime.fromtimestamp(state["next_time"])
     states[state["userid"]] = state
     delete_old_states()
     return jsonify(states)
