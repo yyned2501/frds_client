@@ -22,8 +22,10 @@ def index():
         except ValueError:
             state[k] = v
     if "sleep" in state:
-        state["next_time"] = time.time() + state["sleep"]
-    state["next_date"] = datetime.datetime.fromtimestamp(state["next_time"])
+        state["next_time"] = int(time.time()) + state["sleep"]
+    state["next_date"] = datetime.datetime.fromtimestamp(state["next_time"]).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
     states[state["userid"]] = state
     delete_old_states()
     return jsonify(states)
