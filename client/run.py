@@ -15,8 +15,9 @@ BONUS_MAX = 9
 
 def get_boomid(res_data):
     if res_data:
-        friend_boom_list = [str(res_data[k].get("boomid", 0))
-                            for k in res_data if int(k) != USERID]
+        friend_boom_list = [
+            str(res_data[k].get("boomid", 0)) for k in res_data if int(k) != USERID
+        ]
         for k in res_data:
             if int(k) != USERID and int(k) not in friend_boom_list:
                 d: dict = res_data[k]
@@ -51,8 +52,11 @@ def get_friend_next_time(data: dict, res_data: dict[str, dict]):
     if not (data and res_data):
         return 0
 
-    boom_friend_nexttime_list = [str(res_data[k].get("next_time", int(time.time()+FAST_SLEEP_TIME)))
-                                 for k in res_data if res_data[k].get("boomid", 0) == USERID]
+    boom_friend_nexttime_list = [
+        str(res_data[k].get("next_time", int(time.time() + FAST_SLEEP_TIME)))
+        for k in res_data
+        if res_data[k].get("boomid", 0) == USERID
+    ]
     if len(boom_friend_nexttime_list) > 0:
         next_time = min(boom_friend_nexttime_list)
         logger.info(f"帮助我的好友下次刷新时间：{next_time}")
@@ -60,13 +64,16 @@ def get_friend_next_time(data: dict, res_data: dict[str, dict]):
 
     if boom_id := data.get("boomid", None):
         if d := res_data.get(str(boom_id), None):
-            next_time = d.get("next_time", int(time.time()+FAST_SLEEP_TIME))
+            next_time = d.get("next_time", int(time.time() + FAST_SLEEP_TIME))
             logger.info(f"我帮助的好友下次刷新时间：{next_time}")
             return next_time
 
     if not data.get("state", None) or data.get("point", 0) > 21:
-        free_friend_nexttime_list = [str(res_data[k].get("next_time", int(time.time()+FAST_SLEEP_TIME)))
-                                     for k in res_data if int(k) != USERID and not res_data[k].get("boomid", None)]
+        free_friend_nexttime_list = [
+            str(res_data[k].get("next_time", int(time.time() + FAST_SLEEP_TIME)))
+            for k in res_data
+            if int(k) != USERID and not res_data[k].get("boomid", None)
+        ]
         if len(free_friend_nexttime_list) > 0:
             next_time = min(free_friend_nexttime_list)
             logger.info(f"可以帮助我的好友下次刷新时间：{next_time}")
@@ -89,7 +96,7 @@ def run():
                         else:
                             logger.info(f"上传平局结果")
                             friend_data["state"] = None
-                            friend_data["next_time"] = int(time.time()+1)
+                            friend_data["next_time"] = int(time.time() + 1)
                             post_state(friend_data)
                     else:
                         logger.info(f"好友点数未超过21，帮助结束")
@@ -121,16 +128,13 @@ def run():
         sleep_sec = NORMAL_SLEEP_TIME
         friend_next_time = get_friend_next_time(data, res_data)
         if not friend_next_time:
-            sleep_sec = random.randint(int(sleep_sec/2), sleep_sec)
+            sleep_sec = random.randint(int(sleep_sec / 2), sleep_sec)
         else:
             friend_next_time = int(friend_next_time)
-            sleep_sec = max(random.randint(0, FAST_SLEEP_TIME),
-                            int(friend_next_time-time.time()))
-
-        data["next_time"] = int(time.time() + sleep_sec)
-        data["next_date"] = datetime.datetime.fromtimestamp(
-            int(time.time() + sleep_sec)
-        )
+            sleep_sec = max(
+                random.randint(0, FAST_SLEEP_TIME), int(friend_next_time - time.time())
+            )
+        data["sleep"] = sleep_sec
         logger.info(f"延迟{sleep_sec}秒，汇报状态{data}")
         post_state(data)
         time.sleep(sleep_sec)
