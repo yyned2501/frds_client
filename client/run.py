@@ -118,7 +118,7 @@ def run():
                 logger.info("有好友在线")
                 if friend_boom(res_data):
                     logger.info("有好友应答")
-                    point = random.randint(5, 9)
+                    point = random.randint(BONUS_MIN, BONUS_MAX)
                     logger.info(f"开局{point * 1000}")
                     data["point"] = do_game(point * 1000)
                     data["state"] = 1
