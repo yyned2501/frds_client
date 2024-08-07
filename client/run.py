@@ -38,8 +38,9 @@ def post_state(url, data) -> dict:
                 if r.status_code == 200:
                     return r.json()
                 else:
-                    error += 1
-                    logger.error(f"请求错误{error}次,错误代码{r.status_code}")
+                    logger.error(r.status_code)
+            error += 1
+            logger.error(f"请求错误{error}次,错误代码{r.status_code}")
         except:
             error += 1
             logger.error(f"请求错误{error}次")
@@ -48,7 +49,7 @@ def post_state(url, data) -> dict:
 def start_my_game():
     global res_data
     while 1:
-        if not res_data[str[USERID]].get("state", None):  # 未开局
+        if not res_data.get(str(USERID), {}).get("state", None):  # 未开局
             point = random.randint(BONUS_MIN, BONUS_MAX)
             logger.info(f"开局{point * 1000}")
             data["point"] = do_game(point * 1000)
@@ -78,7 +79,7 @@ def help_friends():
             if friend_data:
                 if friend_data.get("state", None):
                     if int(friend_data.get("point", 0)) > 21:
-                        logger.info(f"好友点数超过21，开始平局")
+                        logger.info(f"好友{key_id}点数超过21，开始平局")
                         if not boom_game(key_id, USERID):
                             logger.info(f"未找到对局，等待服务器更新数据")
                         else:
