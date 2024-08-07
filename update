@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# 设置仓库目录
+REPO_DIR="."
+REMOTE_REPO="https://gitee.com/yyned2501/kf21.git"
+REMOTE_BRANCH="master" # 替换为你的远程分支名，例如 "main"
+
+# 检查是否是一个 Git 仓库
+if [ ! -d ".git" ]; then
+    echo "Initializing Git repository in $REPO_DIR..."
+    git init
+    git remote add origin "$REMOTE_REPO"
+fi
+
+git fetch origin > /dev/null;
+
+if [ $(git rev-list --count --right-only HEAD...origin/"$REMOTE_BRANCH") -gt 0 ]; then  
+    echo "Remote is ahead of local, there are updates."  
+    git reset --hard origin/"$REMOTE_BRANCH"
+    git pull origin "$REMOTE_BRANCH"
+fi
