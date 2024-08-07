@@ -48,6 +48,7 @@ def post_state(url, data) -> dict:
 
 def start_my_game():
     global res_data
+    global data
     while 1:
         if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
             logger.info(f"服务器状态{res_data}")
@@ -61,13 +62,20 @@ def start_my_game():
 
 def post_frds_states():
     global res_data
+    global data
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/states"
     while 1:
         state = game_state(USERID)
-        data = {"data": state}
+        p_data = {"data": state}
         logger.info(f"在线游戏{state}")
-        res_data = post_state(url, data)
+        if str(USERID) in state:
+            data["state"] = 1
+        else:
+            data["state"] = None
+            data["point"] = None
+        post_state(url, p_data)
+        res_data = post_state(SERVER, data)
         logger.info(f"更新服务器状态{res_data}")
         random_sleep(NORMAL_SLEEP_TIME)
 
@@ -75,7 +83,7 @@ def post_frds_states():
 def help_friends():
     global res_data
     while 1:
-        res_data = post_state(SERVER, data)
+        res_data = get_state(SERVER)
         for key_id in res_data:
             if key_id != str(USERID):
                 friend_data = res_data.get(key_id, None)
