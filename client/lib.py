@@ -156,10 +156,10 @@ def game_state(userid):
                         state.append(str(userid))
                     return state
                 else:
-                    print(response.status_code)
+                    logger.error(response.status_code)
                     raise (response.status_code)
         except Exception as e:
-            print(e)
+            logger.error(e)
             error += 1
             logger.error(f"请求错误{error}次")
 

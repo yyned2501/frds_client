@@ -8,7 +8,7 @@ import gevent
 
 
 res_data = {}
-data = {"userid": USERID, "state": 1, "sleep": FAST_SLEEP_TIME}
+data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
 
 
 def random_sleep(sleep_sec):
@@ -66,6 +66,7 @@ def post_frds_states():
     while 1:
         state = game_state(USERID)
         data = {"data": state}
+        logger.info(f"在线游戏{state}")
         res_data = post_state(url, data)
         logger.info(f"更新服务器状态{res_data}")
         random_sleep(NORMAL_SLEEP_TIME)
