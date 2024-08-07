@@ -84,8 +84,8 @@ def help_friends():
                             logger.info(f"未找到对局，等待服务器更新数据")
                         else:
                             logger.info(f"上传平局结果")
-                            friend_data["state"] = None
-                            res_data = post_state(SERVER, friend_data)
+                        friend_data["state"] = None
+                        res_data = post_state(SERVER, friend_data)
         time.sleep(FAST_SLEEP_TIME)
 
 
