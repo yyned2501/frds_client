@@ -2,14 +2,14 @@ from libs import my_game_state, do_game, boom_game
 import time
 import random
 import requests
-from config import USERID, SERVER
+from config import *
 from logs import logger
 
 data = {"userid": USERID}
-FAST_SLEEP_TIME = 3
-NORMAL_SLEEP_TIME = 120
-BONUS_MIN = 10
-BONUS_MAX = 12
+FAST_SLEEP_TIME = FAST_SLEEP_TIME or 3
+NORMAL_SLEEP_TIME = NORMAL_SLEEP_TIME or 120
+BONUS_MIN = BONUS_MIN or 10
+BONUS_MAX = BONUS_MAX or 12
 
 
 def get_boomid(res_data):
