@@ -1,17 +1,10 @@
 import random
 from lib import do_game, boom_game, game_state
-from config import USERID, SERVER
+from config import USERID, SERVER, FAST_SLEEP_TIME, NORMAL_SLEEP_TIME, BONUS_MIN, BONUS_MAX
 from log import logger
 import time
 import requests
 import gevent
-
-
-FAST_SLEEP_TIME = 3
-START_SLEEP_TIME = 60
-NORMAL_SLEEP_TIME = 120
-BONUS_MIN = 1
-BONUS_MAX = 1
 
 
 res_data = {}
@@ -72,7 +65,7 @@ def post_frds_states():
         state = game_state(USERID)
         data = {"data": state}
         res_data = post_state(url, data)
-        time.sleep(120)
+        random_sleep(NORMAL_SLEEP_TIME)
 
 
 def help_friends():
