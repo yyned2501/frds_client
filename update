@@ -1,9 +1,9 @@
 #!/bin/bash
-
 # 设置仓库目录
 REPO_DIR="."
 REMOTE_REPO="https://gitee.com/yyned2501/kf21.git"
 REMOTE_BRANCH="master" # 替换为你的远程分支名，例如 "main"
+
 
 # 检查是否是一个 Git 仓库
 if [ ! -d ".git" ]; then

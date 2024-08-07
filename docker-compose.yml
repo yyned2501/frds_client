@@ -1,15 +1,13 @@
 version: "3"
 services:
-    server:
+    client:
         image: python:3.11
+        container_name: kf-client
         volumes:
-            - ./server:/server
+            - .:/app
         environment:
             - TZ=Asia/Shanghai
         network_mode: bridge
-        working_dir: /server
-        ports:
-            - 8080:5000
-            - 8081:5001
+        working_dir: /app
         tty: true
         command: ["sh","docker-entrypoint.sh"]
