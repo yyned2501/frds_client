@@ -82,6 +82,7 @@ def post_frds_states():
 
 def help_friends():
     global res_data
+    global data
     while 1:
         res_data = get_state(SERVER)
         for key_id in res_data:
@@ -103,6 +104,10 @@ def help_friends():
                                     logger.warning(f"未找到对局，等待服务器更新数据")
                             else:
                                 logger.info(f"重复校验，已平局，放弃平局")
+                        else:
+                            data = res_data.get(str(USERID), data)
+                            data["boomid"] = key_id
+                            res_data = post_state(SERVER, data)
 
         time.sleep(FAST_SLEEP_TIME)
 
