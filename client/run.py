@@ -80,11 +80,51 @@ def post_frds_states():
         random_sleep(NORMAL_SLEEP_TIME)
 
 
+def hand_friend():
+    global res_data
+    global data
+    while 1:
+        for key_id in res_data:
+            if key_id != str(USERID):
+                friend_data = res_data.get(key_id, None)
+                if friend_data:
+                    if friend_data.get("state", None):
+                        data["handid"] = key_id
+                        res_data = post_state(SERVER, data)
+                        break
+        time.sleep(FAST_SLEEP_TIME)
+
+
+def bind_friend():
+    global res_data
+    global data
+    while 1:
+        for key_id in res_data:
+            if key_id != str(USERID):
+                friend_data = res_data.get(key_id, None)
+                if friend_data:
+                    if friend_data.get("handid", None) == USERID:
+                        data["bindid"] = key_id
+                        res_data = post_state(SERVER, data)
+                        break
+        time.sleep(FAST_SLEEP_TIME)
+
+
+def safe_help():
+    global res_data
+    global data
+    while 1:
+        if friend_id := data.get("handid", None):
+            if friend_data := res_data.get(str(friend_id), None):
+                pass
+
+
 def help_friends():
     global res_data
     global data
     while 1:
         res_data = get_state(SERVER)
+        data = res_data.get(str(USERID), data)
         for key_id in res_data:
             if key_id != str(USERID):
                 friend_data = res_data.get(key_id, None)
