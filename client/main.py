@@ -5,6 +5,7 @@ import requests
 import time
 from logs import logger
 from config import USERID, SERVER
+from lib import my_game_state, do_game, boom_game
 
 monkey.patch_all()
 
@@ -30,8 +31,19 @@ def help_friends():
     global res_data
     while 1:
         res_data = get_state()
-        if boomid := friend_online(res_data):
-            pass
+        logger.info(f"服务器状态{res_data}")
+        for key_id in res_data:
+            friend_data = res_data[key_id]
+            if friend_data:
+                if friend_data.get("state", None):
+                    if int(friend_data.get("point", 0)) > 21:
+                        logger.info(f"好友点数超过21，开始平局")
+                        if not boom_game(key_id, USERID):
+                            logger.info(f"未找到对局，等待服务器更新数据")
+                        else:
+                            logger.info(f"上传平局结果")
+                            friend_data["state"] = None
+                            post_state(friend_data)
         time.sleep(FAST_SLEEP_TIME)
 
 
@@ -50,7 +62,7 @@ def post_state(data) -> dict:
             logger.error(f"请求错误{error}次")
 
 
-def get_state():
+def get_state() -> dict[str, dict]:
     error = 0
     while error < 3:
         try:
@@ -66,7 +78,7 @@ def get_state():
 
 
 def run():
-    jobs = [gevent.spawn(help_friends), gevent.spawn(ppp)]
+    jobs = [gevent.spawn(help_friends)]
     gevent.joinall(jobs)
 
 

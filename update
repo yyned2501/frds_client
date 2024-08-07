@@ -21,8 +21,6 @@ while true; do
         git reset --hard origin/"$REMOTE_BRANCH"
         git pull origin "$REMOTE_BRANCH"
         supervisorctl restart main
-    else
-        echo "no updates"  
     fi
     sleep 1m
 done

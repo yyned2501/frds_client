@@ -93,7 +93,7 @@ def game(data):
     return 22
 
 
-def boom_game(userid, my_userid=40074):
+def boom_game(userid, my_userid):
     start_data = find_game(userid)
     continue_data = {"game": "hit", "continue": "yes", "userid": my_userid}
     hit_data = {"game": "hit", "userid": my_userid}
