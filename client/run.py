@@ -50,6 +50,7 @@ def start_my_game():
     global res_data
     while 1:
         if not res_data.get(str(USERID), {}).get("state", None):  # 未开局
+            logger.info(f"服务器状态{res_data}")
             point = random.randint(BONUS_MIN, BONUS_MAX)
             logger.info(f"开局{point * 1000}")
             data["point"] = do_game(point * 1000)
@@ -66,6 +67,7 @@ def post_frds_states():
         state = game_state(USERID)
         data = {"data": state}
         res_data = post_state(url, data)
+        logger.info(f"更新服务器状态{res_data}")
         random_sleep(NORMAL_SLEEP_TIME)
 
 
@@ -73,12 +75,13 @@ def help_friends():
     global res_data
     while 1:
         res_data = post_state(SERVER, data)
-        logger.info(f"服务器状态{res_data}")
+        # logger.info(f"服务器状态{res_data}")
         for key_id in res_data:
             friend_data = res_data[key_id]
             if friend_data:
                 if friend_data.get("state", None):
                     if int(friend_data.get("point", 0)) > 21:
+                        logger.info(f"服务器状态{res_data}")
                         logger.info(f"好友{key_id}点数超过21，开始平局")
                         if not boom_game(key_id, USERID):
                             logger.info(f"未找到对局，等待服务器更新数据")
