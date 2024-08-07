@@ -14,11 +14,13 @@ if [ ! -d ".git" ]; then
     git reset --hard origin/"$REMOTE_BRANCH"
     git pull origin "$REMOTE_BRANCH"
 fi
-
-git fetch origin > /dev/null;
-
-if [ $(git rev-list --count --right-only HEAD...origin/"$REMOTE_BRANCH") -gt 0 ]; then  
-    echo "Remote is ahead of local, there are updates."  
-    git reset --hard origin/"$REMOTE_BRANCH"
-    git pull origin "$REMOTE_BRANCH"
-fi
+while true; do
+    git fetch origin > /dev/null;
+    if [ $(git rev-list --count --right-only HEAD...origin/"$REMOTE_BRANCH") -gt 0 ]; then  
+        echo "Remote is ahead of local, there are updates."  
+        git reset --hard origin/"$REMOTE_BRANCH"
+        git pull origin "$REMOTE_BRANCH"
+        supervisorctl restart 
+    fi
+    sleep 5m
+done
