@@ -75,20 +75,20 @@ def help_friends():
     global res_data
     while 1:
         res_data = post_state(SERVER, data)
-        # logger.info(f"服务器状态{res_data}")
         for key_id in res_data:
-            friend_data = res_data[key_id]
-            if friend_data:
-                if friend_data.get("state", None):
-                    if int(friend_data.get("point", 0)) > 21:
-                        logger.info(f"服务器状态{res_data}")
-                        logger.info(f"好友{key_id}点数超过21，开始平局")
-                        if not boom_game(key_id, USERID):
-                            logger.info(f"未找到对局，等待服务器更新数据")
-                        else:
-                            logger.info(f"上传平局结果")
-                        friend_data["state"] = None
-                        res_data = post_state(SERVER, friend_data)
+            if key_id != str(USERID):
+                friend_data = res_data.get(key_id, None)
+                if friend_data:
+                    if friend_data.get("state", None):
+                        if int(friend_data.get("point", 0)) > 21:
+                            logger.info(f"服务器状态{res_data}")
+                            logger.info(f"好友{key_id}点数超过21，开始平局")
+                            if not boom_game(key_id, USERID):
+                                logger.info(f"未找到对局，等待服务器更新数据")
+                            else:
+                                logger.info(f"上传平局结果")
+                            friend_data["state"] = None
+                            res_data = post_state(SERVER, friend_data)
         time.sleep(FAST_SLEEP_TIME)
 
 
