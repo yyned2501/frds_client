@@ -86,10 +86,14 @@ def help_friends():
                             friend_data["state"] = None
                             res_data = post_state(SERVER, friend_data)
                             logger.info(f"汇报好友，防止他人误点{res_data}")
-                            if boom_game(key_id, USERID):
-                                logger.info(f"上传平局结果")
+                            friend_data = res_data.get(key_id, {})
+                            if friend_data.get("state", None) and int(friend_data.get("point", 0)) > 21:
+                                if boom_game(key_id, USERID):
+                                    logger.info(f"上传平局结果")
+                                else:
+                                    logger.warning(f"未找到对局，等待服务器更新数据")
                             else:
-                                logger.warning(f"未找到对局，等待服务器更新数据")
+                                logger.info(f"重复校验，已平局，放弃平局")
 
         time.sleep(FAST_SLEEP_TIME)
 
