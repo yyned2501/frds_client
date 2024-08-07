@@ -49,7 +49,7 @@ def post_state(url, data) -> dict:
 def start_my_game():
     global res_data
     while 1:
-        if not res_data.get(str(USERID), {}).get("state", None):  # 未开局
+        if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
             logger.info(f"服务器状态{res_data}")
             point = random.randint(BONUS_MIN, BONUS_MAX)
             logger.info(f"开局{point * 1000}")
