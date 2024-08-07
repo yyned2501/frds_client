@@ -8,7 +8,7 @@ import gevent
 
 
 res_data = {}
-data = {"userid": USERID, "sleep": FAST_SLEEP_TIME}
+data = {"userid": USERID, "state": 1, "sleep": FAST_SLEEP_TIME}
 
 
 def random_sleep(sleep_sec):
@@ -90,8 +90,7 @@ def help_friends():
                                 logger.info(f"上传平局结果")
                             else:
                                 logger.warning(f"未找到对局，等待服务器更新数据")
-                            
-                            
+
         time.sleep(FAST_SLEEP_TIME)
 
 
