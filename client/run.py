@@ -89,7 +89,11 @@ def help_friends():
 
 
 def run():
-    jobs = [gevent.spawn(help_friends), gevent.spawn(post_frds_states)]
+    jobs = [
+        gevent.spawn(help_friends),
+        gevent.spawn(post_frds_states),
+        gevent.spawn(start_my_game)
+    ]
     gevent.joinall(jobs)
 
 
