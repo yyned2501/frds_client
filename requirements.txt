@@ -2,3 +2,4 @@ supervisor
 requests
 bs4
 lxml
+gevent

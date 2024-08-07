@@ -1,9 +1,9 @@
-from libs import my_game_state, do_game, boom_game
 import time
 import random
 import requests
 from config import USERID, SERVER
 from logs import logger
+from lib import my_game_state, do_game, boom_game
 
 data = {"userid": USERID}
 FAST_SLEEP_TIME = 3
@@ -69,8 +69,7 @@ def get_friend_next_time(data: dict, res_data: dict[str, dict]):
 
     if not data.get("state", None) or data.get("point", 0) > 21:
         free_friend_nexttime_list = [
-            str(res_data[k].get("next_time", int(
-                time.time() + FAST_SLEEP_TIME)))
+            str(res_data[k].get("next_time", int(time.time() + FAST_SLEEP_TIME)))
             for k in res_data
             if int(k) != USERID and not res_data[k].get("boomid", None)
         ]
@@ -108,10 +107,8 @@ def run():
             data["boomid"] = get_boomid(res_data)
             if data["boomid"]:
                 logger.info(f'帮助{data["boomid"]}')
-                friend_next_time = int(
-                    get_friend_next_time(data, res_data) or 0)
-                sleep_sec = max(FAST_SLEEP_TIME,
-                                friend_next_time - int(time.time()))
+                friend_next_time = int(get_friend_next_time(data, res_data) or 0)
+                sleep_sec = max(FAST_SLEEP_TIME, friend_next_time - int(time.time()))
                 data["sleep"] = sleep_sec
                 post_state(data)
             else:
@@ -138,8 +135,7 @@ def run():
         else:
             friend_next_time = int(friend_next_time)
             sleep_sec = max(
-                random.randint(0, FAST_SLEEP_TIME), int(
-                    friend_next_time - time.time())
+                random.randint(0, FAST_SLEEP_TIME), int(friend_next_time - time.time())
             )
         data["sleep"] = sleep_sec
         logger.info(f"延迟{sleep_sec}秒，汇报状态{data}")
