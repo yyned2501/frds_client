@@ -84,7 +84,7 @@ def game(data):
                             point = 0
                         return point
                     else:
-                        return 22
+                        return None
                 else:
                     raise (response.status_code)
         except:
@@ -130,7 +130,7 @@ def do_game(amount=100):
         return
     while s < 20:
         logger.info(f"当前点数{s}，继续抓牌")
-        s = game(hit_data)
+        s = game(hit_data) or 22
     if s == 21:
         logger.info(f"当前点数{s}，完美")
     elif s == 20:
