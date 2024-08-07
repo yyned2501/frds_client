@@ -20,10 +20,9 @@ while true; do
         echo "Remote is ahead of local, there are updates."  
         git reset --hard origin/"$REMOTE_BRANCH"
         git pull origin "$REMOTE_BRANCH"
-        supervisorctl restart
+        supervisorctl restart kf-client
     else
         echo "no updates"  
     fi
-    echo "sleep 5m"  
-    sleep 5m
+    sleep 1m
 done
