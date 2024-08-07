@@ -1,7 +1,8 @@
+import monkey
 import requests
 from bs4 import BeautifulSoup
 from config import COOKIE
-from logs import logger
+from log import logger
 
 
 url = "https://pt.keepfrds.com/blackjack.php"
@@ -48,7 +49,6 @@ def find_game(userid):
             logger.error(f"请求错误{error}次")
 
 
-
 def my_game_state():
     error = 0
     while error < 3:
@@ -65,7 +65,6 @@ def my_game_state():
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-
 
 
 def game(data):
@@ -139,3 +138,31 @@ def do_game(amount=100):
     else:
         logger.info(f"当前点数{s}，爆了")
     return s
+
+
+def game_state(userid):
+    error = 0
+    state = []
+    while error < 3:
+        try:
+            with requests.get(url, headers=headers) as response:
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, "lxml")
+                    inputs = soup.select(
+                        "#game_available tr td:nth-of-type(4) form input[name='userid']")
+                    state = [input["value"] for input in inputs]
+                    forms = soup.select("#details tr")
+                    if forms and forms[-1].text.strip() == "请等待上局结束":
+                        state.append(str(userid))
+                    return state
+                else:
+                    print(response.status_code)
+                    raise (response.status_code)
+        except Exception as e:
+            print(e)
+            error += 1
+            logger.error(f"请求错误{error}次")
+
+
+if __name__ == '__main__':
+    print(game_state(0))
