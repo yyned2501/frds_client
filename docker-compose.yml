@@ -9,5 +9,7 @@ services:
             - TZ=Asia/Shanghai
         network_mode: bridge
         working_dir: /app
+        ports:
+            - 65020:5001
         tty: true
         command: ["sh","docker-entrypoint.sh"]
