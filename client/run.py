@@ -87,7 +87,7 @@ def help_friends():
                             res_data = post_state(SERVER, friend_data)
                             logger.info(f"汇报好友，防止他人误点{res_data}")
                             friend_data = res_data.get(key_id, {})
-                            if friend_data.get("state", None) and int(friend_data.get("point", 0)) > 21:
+                            if int(friend_data.get("point", 0)) > 21:
                                 if boom_game(key_id, USERID):
                                     logger.info(f"上传平局结果")
                                 else:
