@@ -42,7 +42,9 @@ def post_state(url, data) -> dict:
         try:
             with requests.post(url, data=data) as r:
                 if r.status_code == 200:
-                    return r.json()
+                    rd = r.json()
+                    # logger.info(rd)
+                    return rd
                 else:
                     logger.error(r.status_code)
             error += 1
@@ -67,7 +69,8 @@ def find_game(userid):
             with requests.get(url, headers=headers) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
-                    forms = soup.select("#game_available tr td:nth-of-type(4) form")
+                    forms = soup.select(
+                        "#game_available tr td:nth-of-type(4) form")
                     for form in forms:
                         if form.find("input", value=str(userid)):
                             return parse_form_from_html(form)
@@ -146,7 +149,8 @@ def boom_game(userid, my_userid):
 
 
 def do_game(amount=100):
-    start_data = {"game": "hit", "start": "yes", "amount": amount, "downloads": 0}
+    start_data = {"game": "hit", "start": "yes",
+                  "amount": amount, "downloads": 0}
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
