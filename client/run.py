@@ -14,7 +14,7 @@ from log import logger
 
 
 res_data = {}
-data = {"userid": USERID, "state": 1, "point": 21, "sleep": NORMAL_SLEEP_TIME}
+data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
 
 
 def random_sleep(sleep_sec):
