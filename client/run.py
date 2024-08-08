@@ -14,7 +14,7 @@ from log import logger
 
 
 res_data = {}
-data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
+data = {"userid": USERID, "state": 1, "point": 21, "sleep": NORMAL_SLEEP_TIME}
 
 
 def random_sleep(sleep_sec):
@@ -63,7 +63,6 @@ def hand_friend():
         res_data = get_state(SERVER)
 
         data = res_data.get(str(USERID), data)
-        # logger.info(f"{res_data}\n{data}")
         if friend_id := data.get("handid", None):
             if friend_data := res_data.get(str(friend_id), None):
                 if friend_data.get("bindid", None) != USERID:
@@ -102,6 +101,10 @@ def bind_friend():
             else:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
                 del data["bindid"]
+            if data.get("point", 21) < 21:
+                logger.info(f"开始钓鱼，解除绑定")
+                del data["bindid"]
+
             if not data.get("bindid", None):
                 post_state(SERVER, data)
         else:
