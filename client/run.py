@@ -27,7 +27,7 @@ def start_my_game():
     while 1:
         if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
             logger.info(f"服务器状态{res_data}")
-            point = random.randint(BONUS_MIN, BONUS_MAX)
+            point = random.randint(int(BONUS_MIN), (BONUS_MAX))
             logger.info(f"开局{point * 1000}")
             data["point"] = do_game(point * 1000)
             data["state"] = 1
@@ -188,18 +188,15 @@ def help_friends():
                             friend_data["state"] = None
                             res_data = post_state(SERVER, friend_data)
                             break
-
+        
         time.sleep(FAST_SLEEP_TIME)
 
 
 def run():
     jobs = [
-        gevent.spawn(safe_help),
-        gevent.spawn(safe_start),
-        gevent.spawn(bind_friend),
-        gevent.spawn(hand_friend),
         gevent.spawn(post_frds_states),
-        # gevent.spawn(start_my_game),
+        gevent.spawn(start_my_game),
+        gevent.spawn(help_friends),
     ]
     gevent.joinall(jobs)
 
