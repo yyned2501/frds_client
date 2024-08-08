@@ -21,6 +21,37 @@ headers = {
 }
 
 
+def get_state(url) -> dict[str, dict]:
+    error = 0
+    while error < 3:
+        try:
+            with requests.get(url) as r:
+                if r.status_code == 200:
+                    return r.json()
+                else:
+                    error += 1
+                    logger.error(f"请求错误{error}次,错误代码{r.status_code}")
+        except:
+            error += 1
+            logger.error(f"请求错误{error}次")
+
+
+def post_state(url, data) -> dict:
+    error = 0
+    while error < 3:
+        try:
+            with requests.post(url, data=data) as r:
+                if r.status_code == 200:
+                    return r.json()
+                else:
+                    logger.error(r.status_code)
+            error += 1
+            logger.error(f"请求错误{error}次,错误代码{r.status_code}")
+        except:
+            error += 1
+            logger.error(f"请求错误{error}次")
+
+
 def parse_form_from_html(soup):
     form_elements = {}
     for input_tag in soup.find_all("input"):

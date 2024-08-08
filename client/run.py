@@ -1,5 +1,5 @@
 import random
-from lib import do_game, boom_game, game_state
+from lib import do_game, boom_game, game_state, get_state, post_state
 from config import (
     USERID,
     SERVER,
@@ -20,37 +20,6 @@ data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
 
 def random_sleep(sleep_sec):
     time.sleep(random.randint(int(sleep_sec / 2), sleep_sec))
-
-
-def get_state(url) -> dict[str, dict]:
-    error = 0
-    while error < 3:
-        try:
-            with requests.get(url) as r:
-                if r.status_code == 200:
-                    return r.json()
-                else:
-                    error += 1
-                    logger.error(f"请求错误{error}次,错误代码{r.status_code}")
-        except:
-            error += 1
-            logger.error(f"请求错误{error}次")
-
-
-def post_state(url, data) -> dict:
-    error = 0
-    while error < 3:
-        try:
-            with requests.post(url, data=data) as r:
-                if r.status_code == 200:
-                    return r.json()
-                else:
-                    logger.error(r.status_code)
-            error += 1
-            logger.error(f"请求错误{error}次,错误代码{r.status_code}")
-        except:
-            error += 1
-            logger.error(f"请求错误{error}次")
 
 
 def start_my_game():
@@ -110,8 +79,8 @@ def bind_friend():
             if key_id != str(USERID):
                 friend_data = res_data.get(key_id, None)
                 if friend_data:
-                    if friend_data.get("handid", None) == USERID:
-                        data["bindid"] = key_id
+                    if friend_data.get("handid", None) == USERID:  # 队友要帮助我
+                        data["bindid"] = key_id  # 我绑定要帮助我的队友
                         res_data = post_state(SERVER, data)
                         break
         random_sleep(FAST_SLEEP_TIME)

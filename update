@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # 设置仓库目录
-REPO_DIR="."
-REMOTE_REPO="https://gitee.com/yyned2501/kf21.git"
 REMOTE_BRANCH="master"
+
+if [ -n "$GIT_REMOTE" ]; then
+    REMOTE_REPO="$GIT_REMOTE"
+else
+    # 如果没有设置GIT_REMOTE，则默认使用Gitee
+    REMOTE_REPO="https://gitee.com/yyned2501/kf21.git"
+fi
 
 gitpull() {
     git reset --hard origin/"$REMOTE_BRANCH"
@@ -11,7 +16,6 @@ gitpull() {
 }
 # 检查是否是一个 Git 仓库
 if [ ! -d ".git" ]; then
-    echo "Initializing Git repository in $REPO_DIR..."
     git init
     git remote add origin "$REMOTE_REPO"
     git fetch origin >/dev/null
@@ -26,5 +30,5 @@ while true; do
         fi
         supervisorctl restart main
     fi
-    sleep 1m
+    sleep 60
 done
