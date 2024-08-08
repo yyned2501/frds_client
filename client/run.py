@@ -17,6 +17,14 @@ res_data = {}
 data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
 
 
+def work_time():
+    t = time.time()
+    hour = (t // 3600 + 8) % 24
+    if 1 <= hour < 9:
+        return False
+    return True
+
+
 def random_sleep(sleep_sec):
     time.sleep(random.randint(int(sleep_sec / 2), sleep_sec))
 
@@ -25,14 +33,17 @@ def start_my_game():
     global res_data
     global data
     while 1:
-        if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
-            logger.info(f"服务器状态{res_data}")
-            point = random.randint(int(BONUS_MIN), (BONUS_MAX))
-            logger.info(f"开局{point * 1000}")
-            data["point"] = do_game(point * 1000)
-            data["state"] = 1
-            res_data = post_state(SERVER, data)
-        random_sleep(1)
+        if work_time():
+            if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
+                logger.info(f"服务器状态{res_data}")
+                point = random.randint(int(BONUS_MIN), (BONUS_MAX))
+                logger.info(f"开局{point * 1000}")
+                data["point"] = do_game(point * 1000)
+                data["state"] = 1
+                res_data = post_state(SERVER, data)
+            random_sleep(1)
+        else:
+            time.sleep(60)
 
 
 def post_frds_states():
@@ -41,19 +52,50 @@ def post_frds_states():
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/states"
     while 1:
-        state = game_state(USERID)
-        p_data = {"data": state}
-        logger.info(f"在线游戏{state}")
-        if state:
-            if str(USERID) in state:
-                data["state"] = 1
-            else:
-                data["state"] = None
-                data["point"] = None
-            post_state(url, p_data)
-            res_data = post_state(SERVER, data)
-            logger.info(f"更新服务器状态{res_data}")
-        random_sleep(NORMAL_SLEEP_TIME)
+        if work_time():
+            state = game_state(USERID)
+            p_data = {"data": state}
+            logger.info(f"在线游戏{state}")
+            if state:
+                if str(USERID) in state:
+                    data["state"] = 1
+                else:
+                    data["state"] = None
+                    data["point"] = None
+                post_state(url, p_data)
+                res_data = post_state(SERVER, data)
+                logger.info(f"更新服务器状态{res_data}")
+            random_sleep(NORMAL_SLEEP_TIME)
+        else:
+            time.sleep(60)
+
+
+def help_friends():
+    global res_data
+    global data
+    while 1:
+        if work_time():
+            res_data = get_state(SERVER)
+            data = res_data.get(str(USERID), data)
+            for key_id in res_data:
+                if key_id != str(USERID):
+                    friend_data = res_data.get(key_id, None)
+                    if friend_data:
+                        if friend_data.get("state", None):
+                            if int(friend_data.get("point", 0)) > 21:
+                                logger.info(f"服务器状态{res_data}")
+                                logger.info(f"好友{key_id}点数超过21，开始平局")
+                                if boom_game(key_id, USERID):
+                                    logger.info(f"上传平局结果")
+                                else:
+                                    logger.warning(f"未找到对局，等待服务器更新数据")
+                                friend_data["point"] = None
+                                friend_data["state"] = None
+                                res_data = post_state(SERVER, friend_data)
+                                break
+            random_sleep(FAST_SLEEP_TIME)
+        else:
+            time.sleep(60*10)
 
 
 def hand_friend():
@@ -164,32 +206,6 @@ def safe_start():
                     logger.info("帮助我的好友离线了，查找其他好友")
                     del data["bindid"]
         time.sleep(1)
-
-
-def help_friends():
-    global res_data
-    global data
-    while 1:
-        res_data = get_state(SERVER)
-        data = res_data.get(str(USERID), data)
-        for key_id in res_data:
-            if key_id != str(USERID):
-                friend_data = res_data.get(key_id, None)
-                if friend_data:
-                    if friend_data.get("state", None):
-                        if int(friend_data.get("point", 0)) > 21:
-                            logger.info(f"服务器状态{res_data}")
-                            logger.info(f"好友{key_id}点数超过21，开始平局")
-                            if boom_game(key_id, USERID):
-                                logger.info(f"上传平局结果")
-                            else:
-                                logger.warning(f"未找到对局，等待服务器更新数据")
-                            friend_data["point"] = None
-                            friend_data["state"] = None
-                            res_data = post_state(SERVER, friend_data)
-                            break
-        
-        time.sleep(FAST_SLEEP_TIME)
 
 
 def run():
