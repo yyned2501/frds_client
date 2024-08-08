@@ -1,9 +1,9 @@
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, REMAIN_POINT
+from config import COOKIE
 from log import logger
-
+REMAIN_POINT = 20
 
 url = "https://pt.keepfrds.com/blackjack.php"
 headers = {
