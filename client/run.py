@@ -56,26 +56,32 @@ def post_frds_states():
         random_sleep(NORMAL_SLEEP_TIME)
 
 
+def unhand(friend_id):
+    global res_data
+    global data
+    friend_data = res_data.get(str(friend_id), None)
+    if not friend_data:
+        logger.info(f"好友{friend_id}已离线，解除绑定")
+        del data["handid"]
+        return post_state(SERVER, data)
+    if friend_data.get("bindid", None) != USERID:
+        logger.info(f"好友{friend_id}已接收其他好友的帮助，解除绑定")
+        del data["handid"]
+        return post_state(SERVER, data)
+    if friend_data.get("point", 22) < 21:
+        logger.info(f"好友{friend_id}已开始钓鱼，解除绑定")
+        del data["handid"]
+        return post_state(SERVER, data)
+
+
 def hand_friend():
     global res_data
     global data
     while 1:
         res_data = get_state(SERVER)
-
         data = res_data.get(str(USERID), data)
         if friend_id := data.get("handid", None):
-            if friend_data := res_data.get(str(friend_id), None):
-                if friend_data.get("bindid", None) != USERID:
-                    logger.info(f"好友{friend_id}已接收其他好友的帮助，解除绑定")
-                    del data["handid"]
-                if friend_data.get("point", 22) < 21:
-                    logger.info(f"好友{friend_id}已开始钓鱼，解除绑定")
-                    del data["handid"]
-            else:
-                logger.info(f"好友{friend_id}已离线，解除绑定")
-                del data["handid"]
-            if not data.get("handid", None):
-                post_state(SERVER, data)
+            unhand(friend_id)
         else:
             for key_id in res_data:
                 if key_id != str(USERID):
@@ -105,8 +111,6 @@ def unbind(friend_id):
         logger.info(f"开始钓鱼，解除绑定")
         del data["bindid"]
         return post_state(SERVER, data)
-
-            
 
 
 def bind_friend():
