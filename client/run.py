@@ -118,7 +118,6 @@ def safe_help():
     global data
     while 1:
         if friend_id := data.get("handid", None):
-            logger.info(f"准备帮助好友{friend_id}")
             if friend_data := res_data.get(str(friend_id), None):
                 if bind_id := friend_data.get("bindid", None):
                     if bind_id == USERID:
