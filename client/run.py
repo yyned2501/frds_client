@@ -36,7 +36,8 @@ def start_my_game():
         if work_time():
             if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
                 logger.info(f"服务器状态{res_data}")
-                point = random.randint(int(BONUS_MIN), (BONUS_MAX))
+                point = random.randint(max(int(BONUS_MIN), 1), max(
+                    int(BONUS_MIN), int(BONUS_MAX), 1))
                 logger.info(f"开局{point * 1000}")
                 data["point"] = do_game(point * 1000)
                 data["state"] = 1
