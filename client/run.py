@@ -1,6 +1,13 @@
 import random
 from lib import do_game, boom_game, game_state
-from config import USERID, SERVER, FAST_SLEEP_TIME, NORMAL_SLEEP_TIME, BONUS_MIN, BONUS_MAX
+from config import (
+    USERID,
+    SERVER,
+    FAST_SLEEP_TIME,
+    NORMAL_SLEEP_TIME,
+    BONUS_MIN,
+    BONUS_MAX,
+)
 from log import logger
 import time
 import requests
@@ -133,15 +140,15 @@ def help_friends():
                         if int(friend_data.get("point", 0)) > 21:
                             logger.info(f"服务器状态{res_data}")
                             logger.info(f"好友{key_id}点数超过21，开始平局")
-                            friend_data["state"] = None
-                            res_data = post_state(SERVER, friend_data)
-                            logger.info(f"汇报好友，防止他人误点{res_data}")
                             friend_data = res_data.get(key_id, {})
                             if int(friend_data.get("point", 0)) > 21:
                                 if boom_game(key_id, USERID):
                                     logger.info(f"上传平局结果")
                                 else:
                                     logger.warning(f"未找到对局，等待服务器更新数据")
+                                friend_data["point"] = None
+                                friend_data["state"] = None
+                                res_data = post_state(SERVER, friend_data)
                             else:
                                 logger.info(f"重复校验，已平局，放弃平局")
 
@@ -152,7 +159,7 @@ def run():
     jobs = [
         gevent.spawn(help_friends),
         gevent.spawn(post_frds_states),
-        gevent.spawn(start_my_game)
+        gevent.spawn(start_my_game),
     ]
     gevent.joinall(jobs)
 
