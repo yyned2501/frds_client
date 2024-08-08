@@ -92,7 +92,7 @@ def hand_friend():
                         data["handid"] = key_id
                         res_data = post_state(SERVER, data)
                         break
-        time.sleep(FAST_SLEEP_TIME)
+        random_sleep(FAST_SLEEP_TIME)
 
 
 def bind_friend():
@@ -107,7 +107,7 @@ def bind_friend():
                         data["bindid"] = key_id
                         res_data = post_state(SERVER, data)
                         break
-        time.sleep(FAST_SLEEP_TIME)
+        random_sleep(FAST_SLEEP_TIME)
 
 
 def safe_help():
@@ -144,10 +144,6 @@ def help_friends():
                                     logger.warning(f"未找到对局，等待服务器更新数据")
                             else:
                                 logger.info(f"重复校验，已平局，放弃平局")
-                        else:
-                            data = res_data.get(str(USERID), data)
-                            data["boomid"] = key_id
-                            res_data = post_state(SERVER, data)
 
         time.sleep(FAST_SLEEP_TIME)
 
