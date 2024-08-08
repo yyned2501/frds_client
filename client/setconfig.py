@@ -10,7 +10,7 @@ def mk_write(k, v):
 
 
 if __name__ == "__main__":
-    with open("config.py", "w") as f:
+    with open("client/config.py", "w") as f:
         for k, v in vars(config_example).items():
             if not k.startswith("__"):
                 if k in dir(config):
