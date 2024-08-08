@@ -64,7 +64,8 @@ def unhand(friend_id):
         logger.info(f"好友{friend_id}已离线，解除绑定")
         del data["handid"]
         return post_state(SERVER, data)
-    if friend_data.get("bindid", None) != USERID:
+    friend_bind_id =  friend_data.get("bindid", None) 
+    if friend_bind_id and friend_bind_id!= USERID:
         logger.info(f"好友{friend_id}已接收其他好友的帮助，解除绑定")
         del data["handid"]
         return post_state(SERVER, data)
