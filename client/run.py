@@ -66,17 +66,17 @@ def hand_friend():
             friend_data = res_data.get(str(friend_id), None)
             if not friend_data:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
-                del data["handid"]
+                data["handid"] = None
             else:
                 friend_bind_id = friend_data.get("bindid", None)
                 if friend_bind_id and friend_bind_id != USERID:
                     logger.info(f"好友{friend_id}已接收其他好友的帮助，解除绑定")
-                    del data["handid"]
+                    data["handid"] = None
                 elif friend_data.get("point", 22) < 21:
                     logger.info(f"好友{friend_id}已开始钓鱼，解除绑定")
-                    del data["handid"]
-                if not data.get("handid", None):
-                    res_data = post_state(SERVER, data)
+                    data["handid"] = None
+            if not data.get("handid", None):
+                res_data = post_state(SERVER, data)
         else:
             for key_id in res_data:
                 if key_id != str(USERID):
@@ -98,13 +98,13 @@ def bind_friend():
             friend_data = res_data.get(str(friend_id), None)
             if not friend_data:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
-                del data["bindid"]
+                data["bindid"] = None
             elif friend_data.get("handid", None) != USERID:
                 logger.info(f"好友{friend_id}不帮助我了，解除绑定")
-                del data["bindid"]
+                data["bindid"] = None
             elif data.get("state", None) and (data.get("point", 21) <= 21):
                 logger.info(f"开始钓鱼，解除绑定")
-                del data["bindid"]
+                data["bindid"] = None
             if not data.get("bindid", None):
                 res_data = post_state(SERVER, data)
         else:
