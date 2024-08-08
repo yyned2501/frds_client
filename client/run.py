@@ -60,6 +60,7 @@ def hand_friend():
     global res_data
     global data
     while 1:
+        res_data = get_state(SERVER)
         if friend_id := data.get("handid", None):
             if friend_data := res_data.get(str(friend_id), None):
                 if friend_data.get("bindid", None) != USERID:
@@ -145,8 +146,7 @@ def safe_start():
             if res_data.get(str(friend_id), None):
                 bonus = random.randint(BONUS_MIN, BONUS_MAX)*1000
                 logger.info(f"已绑定好友{friend_id},开局{bonus}")
-                point = do_game(bonus)
-                data["point"] = point
+                data["point"] = do_game(bonus)
                 data["state"] = 1
                 res_data = post_state(SERVER, data)
             else:
