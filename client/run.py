@@ -105,7 +105,8 @@ def bind_friend():
             else:
                 if data.get("state", None):
                     logger.info(data)
-                    if data.get("point", 21) <= 21:
+                    point = data.get("point", 21) or 21
+                    if point <= 21:
                         logger.info(f"开始钓鱼，解除绑定")
                         data["bindid"] = None
             if not data.get("bindid", None):
