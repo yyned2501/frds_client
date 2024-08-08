@@ -167,7 +167,7 @@ def do_game(amount=100):
         logger.info(f"当前点数{s}，完美")
     elif s < 21:
         logger.info(f"当前点数{s}，停止抓牌")
-        return game(stop_data)
+        game(stop_data)
     else:
         logger.info(f"当前点数{s}，爆了")
     return s
