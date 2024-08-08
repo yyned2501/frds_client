@@ -1,4 +1,6 @@
 import random
+import time
+import gevent
 from lib import do_game, boom_game, game_state, get_state, post_state
 from config import (
     USERID,
@@ -9,9 +11,6 @@ from config import (
     BONUS_MAX,
 )
 from log import logger
-import time
-import requests
-import gevent
 
 
 res_data = {}
@@ -77,7 +76,7 @@ def hand_friend():
                 if key_id != str(USERID):
                     friend_data = res_data.get(key_id, None)
                     if friend_data:
-                        if not friend_data.get("state", None):
+                        if not friend_data.get("state", None) and not friend_data.get("bindid", None):
                             logger.info(f"检测到好友{key_id}需要帮助，开始绑定")
                             data["handid"] = key_id
                             res_data = post_state(SERVER, data)
