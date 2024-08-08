@@ -112,15 +112,17 @@ def bind_friend():
                 res_data = post_state(SERVER, data)
         else:
             if not data.get("state", None):
+                handids = []
                 for key_id in res_data:
                     if key_id != str(USERID):
                         friend_data = res_data.get(key_id, None)
                         if friend_data:
                             if friend_data.get("handid", None) == USERID:  # 队友要帮助我
+                                handids.append(key_id)
                                 logger.info(f"绑定bindid:{key_id}")
-                                data["bindid"] = key_id  # 我绑定要帮助我的队友
-                                res_data = post_state(SERVER, data)
-                                break
+                if len(handids) > 0:
+                    data["bindid"] = random.choice(handids)  # 随机选一个好友帮助我
+                    res_data = post_state(SERVER, data)
         time.sleep(1)
 
 
