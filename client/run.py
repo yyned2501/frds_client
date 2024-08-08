@@ -99,11 +99,9 @@ def bind_friend():
             if not friend_data:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
                 del data["bindid"]
-                res_data = post_state(SERVER, data)
             elif friend_data.get("handid", None) != USERID:
                 logger.info(f"好友{friend_id}不帮助我了，解除绑定")
                 del data["bindid"]
-                res_data = post_state(SERVER, data)
             elif data.get("state", None) and (data.get("point", 21) <= 21):
                 logger.info(f"开始钓鱼，解除绑定")
                 del data["bindid"]
