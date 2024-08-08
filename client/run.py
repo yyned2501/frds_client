@@ -95,9 +95,8 @@ def bind_friend():
     global data
     while 1:
         if friend_id := data.get("bindid", None):
-            print(friend_id)
             if friend_data := res_data.get(str(friend_id), None):
-                if friend_data.get("hindid", None) != USERID:
+                if friend_data.get("handid", None) != USERID:
                     logger.info(f"好友{friend_id}不帮助我了，解除绑定")
                     del data["bindid"]
             else:
@@ -135,9 +134,6 @@ def safe_help():
                             friend_data["point"] = None
                             friend_data["state"] = None
                             res_data = post_state(SERVER, friend_data)
-
-                else:
-                    logger.info(f"等待好友{friend_id}应答帮助")
         time.sleep(1)
 
 
@@ -145,7 +141,7 @@ def safe_start():
     global res_data
     global data
     while 1:
-        if friend_id := data.get("bandid", None):
+        if friend_id := data.get("bindid", None):
             if res_data.get(str(friend_id), None):
                 bonus = random.randint(BONUS_MIN, BONUS_MAX)*1000
                 logger.info(f"已绑定好友{friend_id},开局{bonus}")
@@ -154,7 +150,7 @@ def safe_start():
                 res_data = post_state(SERVER, data)
             else:
                 logger.info("帮助我的好友离线了，查找其他好友")
-                del data["bandid"]
+                del data["bindid"]
         time.sleep(1)
 
 
