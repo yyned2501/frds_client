@@ -113,10 +113,11 @@ def unbind(friend_id):
         del data["bindid"]
         res_data = post_state(SERVER, data)
         return
-    if data.get("point", 21) < 21:
+    if data.get("state",None) and (data.get("point", 21) <= 21):
         logger.info(f"开始钓鱼，解除绑定")
-        del data["bindid"]
+        data["bindid"] = None
         res_data = post_state(SERVER, data)
+        print(friend_id,data)
         return
 
 
@@ -125,6 +126,8 @@ def bind_friend():
     global data
     while 1:
         if friend_id := data.get("bindid", None):
+            print(data)
+            print("1",friend_id)
             unbind(friend_id)
         else:
             for key_id in res_data:
