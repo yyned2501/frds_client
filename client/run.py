@@ -61,7 +61,9 @@ def hand_friend():
     global data
     while 1:
         res_data = get_state(SERVER)
+
         data = res_data.get(str(USERID), data)
+        # logger.info(f"{res_data}\n{data}")
         if friend_id := data.get("handid", None):
             if friend_data := res_data.get(str(friend_id), None):
                 if friend_data.get("bindid", None) != USERID:
@@ -85,22 +87,23 @@ def hand_friend():
                             data["handid"] = key_id
                             res_data = post_state(SERVER, data)
                             break
-        time.sleep(1)
+        random_sleep(FAST_SLEEP_TIME)
 
 
 def bind_friend():
     global res_data
     global data
     while 1:
-        if friend_id := data.get("bandid", None):
+        if friend_id := data.get("bindid", None):
+            print(friend_id)
             if friend_data := res_data.get(str(friend_id), None):
                 if friend_data.get("hindid", None) != USERID:
                     logger.info(f"好友{friend_id}不帮助我了，解除绑定")
-                    del data["bandid"]
+                    del data["bindid"]
             else:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
-                del data["bandid"]
-            if not data.get("bandid", None):
+                del data["bindid"]
+            if not data.get("bindid", None):
                 post_state(SERVER, data)
         else:
             for key_id in res_data:
