@@ -154,7 +154,7 @@ def safe_start():
         if not data.get("state", None):
             if friend_id := data.get("bindid", None):
                 if res_data.get(str(friend_id), None):
-                    bonus = random.randint(BONUS_MIN, BONUS_MAX)*1000
+                    bonus = random.randint(int(BONUS_MIN), int(BONUS_MAX))*1000
                     logger.info(data)
                     logger.info(f"已绑定好友{friend_id},开局{bonus}")
                     data["point"] = do_game(bonus)
