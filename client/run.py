@@ -88,14 +88,23 @@ def bind_friend():
     global res_data
     global data
     while 1:
-        for key_id in res_data:
-            if key_id != str(USERID):
-                friend_data = res_data.get(key_id, None)
-                if friend_data:
-                    if friend_data.get("handid", None) == USERID:  # 队友要帮助我
-                        data["bindid"] = key_id  # 我绑定要帮助我的队友
-                        res_data = post_state(SERVER, data)
-                        break
+        if friend_id := data.get("bandid", None):
+            if friend_data := res_data.get(str(friend_id), None):
+                if friend_data.get("hindid", None) != USERID:
+                    logger.info(f"好友{friend_id}不帮助我了，解除绑定")
+                    del data["bandid"]
+            else:
+                logger.info(f"好友{friend_id}已离线，解除绑定")
+                del data["bandid"]
+        else:
+            for key_id in res_data:
+                if key_id != str(USERID):
+                    friend_data = res_data.get(key_id, None)
+                    if friend_data:
+                        if friend_data.get("handid", None) == USERID:  # 队友要帮助我
+                            data["bindid"] = key_id  # 我绑定要帮助我的队友
+                            res_data = post_state(SERVER, data)
+                            break
         time.sleep(1)
 
 
