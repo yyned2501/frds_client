@@ -165,7 +165,7 @@ def do_game(amount=100):
         s = game(hit_data) or 22
     if s == 21:
         logger.info(f"当前点数{s}，完美")
-    elif s >= REMAIN_POINT:
+    elif s < 21:
         logger.info(f"当前点数{s}，停止抓牌")
         return game(stop_data)
     else:
