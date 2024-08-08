@@ -71,6 +71,8 @@ def hand_friend():
             else:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
                 del data["handid"]
+            if not data.get("handid", None):
+                post_state(SERVER, data)
         else:
             for key_id in res_data:
                 if key_id != str(USERID):
@@ -96,6 +98,8 @@ def bind_friend():
             else:
                 logger.info(f"好友{friend_id}已离线，解除绑定")
                 del data["bandid"]
+            if not data.get("bandid", None):
+                post_state(SERVER, data)
         else:
             for key_id in res_data:
                 if key_id != str(USERID):
