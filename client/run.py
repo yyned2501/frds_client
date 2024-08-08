@@ -76,7 +76,7 @@ def post_frds_states():
         state = game_state(USERID)
         p_data = {"data": state}
         logger.info(f"在线游戏{state}")
-        if str(USERID) in state:
+        if state and str(USERID) in state:
             data["state"] = 1
         else:
             data["state"] = None
