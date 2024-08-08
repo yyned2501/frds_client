@@ -1,7 +1,7 @@
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE
+from config import COOKIE, REMAIN_POINT
 from log import logger
 
 
@@ -36,8 +36,7 @@ def find_game(userid):
             with requests.get(url, headers=headers) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
-                    forms = soup.select(
-                        "#game_available tr td:nth-of-type(4) form")
+                    forms = soup.select("#game_available tr td:nth-of-type(4) form")
                     for form in forms:
                         if form.find("input", value=str(userid)):
                             return parse_form_from_html(form)
@@ -116,8 +115,7 @@ def boom_game(userid, my_userid):
 
 
 def do_game(amount=100):
-    start_data = {"game": "hit", "start": "yes",
-                  "amount": amount, "downloads": 0}
+    start_data = {"game": "hit", "start": "yes", "amount": amount, "downloads": 0}
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
@@ -127,12 +125,12 @@ def do_game(amount=100):
     if not s:
         logger.info("上一场未结束")
         return
-    while s < 20:
+    while s < REMAIN_POINT:
         logger.info(f"当前点数{s}，继续抓牌")
         s = game(hit_data) or 22
     if s == 21:
         logger.info(f"当前点数{s}，完美")
-    elif s == 20:
+    elif s >= REMAIN_POINT:
         logger.info(f"当前点数{s}，停止抓牌")
         return game(stop_data)
     else:
@@ -149,7 +147,8 @@ def game_state(userid):
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     inputs = soup.select(
-                        "#game_available tr td:nth-of-type(4) form input[name='userid']")
+                        "#game_available tr td:nth-of-type(4) form input[name='userid']"
+                    )
                     state = [input["value"] for input in inputs]
                     forms = soup.select("#details tr")
                     if forms and forms[-1].text.strip() == "请等待上局结束":
@@ -164,5 +163,5 @@ def game_state(userid):
             logger.error(f"请求错误{error}次")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(game_state(0))
