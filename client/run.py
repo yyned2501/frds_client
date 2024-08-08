@@ -61,6 +61,7 @@ def hand_friend():
     global data
     while 1:
         res_data = get_state(SERVER)
+        data = res_data.get(str(USERID), data)
         if friend_id := data.get("handid", None):
             if friend_data := res_data.get(str(friend_id), None):
                 if friend_data.get("bindid", None) != USERID:
