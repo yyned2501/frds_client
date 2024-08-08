@@ -63,16 +63,19 @@ def unhand(friend_id):
     if not friend_data:
         logger.info(f"好友{friend_id}已离线，解除绑定")
         del data["handid"]
-        return post_state(SERVER, data)
-    friend_bind_id =  friend_data.get("bindid", None) 
-    if friend_bind_id and friend_bind_id!= USERID:
+        res_data = post_state(SERVER, data)
+        return
+    friend_bind_id = friend_data.get("bindid", None)
+    if friend_bind_id and friend_bind_id != USERID:
         logger.info(f"好友{friend_id}已接收其他好友的帮助，解除绑定")
         del data["handid"]
-        return post_state(SERVER, data)
+        res_data = post_state(SERVER, data)
+        return
     if friend_data.get("point", 22) < 21:
         logger.info(f"好友{friend_id}已开始钓鱼，解除绑定")
         del data["handid"]
-        return post_state(SERVER, data)
+        res_data = post_state(SERVER, data)
+        return
 
 
 def hand_friend():
@@ -103,15 +106,18 @@ def unbind(friend_id):
     if not friend_data:
         logger.info(f"好友{friend_id}已离线，解除绑定")
         del data["bindid"]
-        return post_state(SERVER, data)
+        res_data = post_state(SERVER, data)
+        return
     if friend_data.get("handid", None) != USERID:
         logger.info(f"好友{friend_id}不帮助我了，解除绑定")
         del data["bindid"]
-        return post_state(SERVER, data)
+        res_data = post_state(SERVER, data)
+        return
     if data.get("point", 21) < 21:
         logger.info(f"开始钓鱼，解除绑定")
         del data["bindid"]
-        return post_state(SERVER, data)
+        res_data = post_state(SERVER, data)
+        return
 
 
 def bind_friend():
@@ -157,16 +163,18 @@ def safe_start():
     global res_data
     global data
     while 1:
-        if friend_id := data.get("bindid", None):
-            if res_data.get(str(friend_id), None):
-                bonus = random.randint(BONUS_MIN, BONUS_MAX)*1000
-                logger.info(f"已绑定好友{friend_id},开局{bonus}")
-                data["point"] = do_game(bonus)
-                data["state"] = 1
-                res_data = post_state(SERVER, data)
-            else:
-                logger.info("帮助我的好友离线了，查找其他好友")
-                del data["bindid"]
+        if not data.get("state", None):
+            if friend_id := data.get("bindid", None):
+                if res_data.get(str(friend_id), None):
+                    bonus = random.randint(BONUS_MIN, BONUS_MAX)*1000
+                    logger.info(data)
+                    logger.info(f"已绑定好友{friend_id},开局{bonus}")
+                    data["point"] = do_game(bonus)
+                    data["state"] = 1
+                    res_data = post_state(SERVER, data)
+                else:
+                    logger.info("帮助我的好友离线了，查找其他好友")
+                    del data["bindid"]
         time.sleep(1)
 
 
