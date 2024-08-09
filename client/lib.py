@@ -3,7 +3,7 @@ import time
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, REMAIN_POINT
+from config import COOKIE, REMAIN_POINT,SAVE_ERR_PAGE
 from log import logger
 import traceback
 
@@ -123,11 +123,12 @@ def game(data):
                             point = 0
                         return point
                     else:
-                        if not os.path.exists("error_pages"):  
-                            os.makedirs("error_pages")  
-                        with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
-                            f.write(soup.prettify())
-                        return None
+                        if SAVE_ERR_PAGE:
+                            if not os.path.exists("error_pages"):  
+                                os.makedirs("error_pages")  
+                            with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
+                                f.write(soup.prettify())
+                        logger.error("未能获取到页面点数，返回None")
                 else:
                     raise (response.status_code)
         except:
