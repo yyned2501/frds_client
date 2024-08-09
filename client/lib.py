@@ -1,3 +1,4 @@
+import os
 import time
 import monkey
 import requests
@@ -122,7 +123,9 @@ def game(data):
                             point = 0
                         return point
                     else:
-                        with open(f"error_page_{int(time.time())}.html", "w") as f:
+                        if not os.path.exists("error_pages"):  
+                            os.makedirs("error_pages")  
+                        with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
                             f.write(soup.prettify())
                         return None
                 else:
