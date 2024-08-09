@@ -64,7 +64,8 @@ def post_frds_states():
                 else:
                     data["state"] = None
                     data["point"] = None
-                post_state(url, p_data)
+                res_data = post_state(url, p_data)
+                data = res_data.get(str(USERID), data)
                 res_data = post_state(SERVER, data)
                 logger.info(f"更新服务器状态{res_data}")
             random_sleep(NORMAL_SLEEP_TIME)
