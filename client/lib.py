@@ -121,6 +121,7 @@ def game(data):
                         return point
                     else:
                         logger.error(soup.prettify())
+                        return None
                 else:
                     raise (response.status_code)
         except:
