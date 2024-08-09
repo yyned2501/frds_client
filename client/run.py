@@ -1,5 +1,4 @@
 import random
-import threading
 import time
 import gevent
 from lib import do_game, boom_game, game_state, get_state, post_state
@@ -16,7 +15,6 @@ from log import logger
 
 res_data = {}
 data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
-lock = threading.Lock()
 
 
 def work_time():
@@ -44,12 +42,11 @@ def post_frds_states():
                       "sleep": NORMAL_SLEEP_TIME}
             logger.info(f"在线游戏{state}")
             if state:
-                with lock:
-                    if str(USERID) in state:
-                        data["state"] = 1
-                    else:
-                        data["state"] = None
-                        data["point"] = None
+                if str(USERID) in state:
+                    data["state"] = 1
+                else:
+                    data["state"] = None
+                    data["point"] = None
                 res_data = post_state(url, p_data)
                 logger.info(f"更新服务器状态{res_data}")
             random_sleep(NORMAL_SLEEP_TIME)
@@ -64,21 +61,19 @@ def start_my_game():
     url += "/api/state"
     while 1:
         if work_time():
-            with lock:
-                if not data.get("state", None):
-                    logger.info(f"服务器状态{res_data}")
-                    bonus = random.randint(
-                        max(int(BONUS_MIN), 1), max(
-                            int(BONUS_MIN), int(BONUS_MAX), 1)
-                    )*1000
-                    logger.info(f"开局{bonus}")
-                    data["point"] = do_game(bonus)
-                    data["bonus"] = bonus
-                    data["state"] = 1
-                    logger.info(f"上报点数{data}")
-                    res_data = post_state(url, data)
-                    logger.info(f"更新服务器状态{res_data}")
-                    # data = res_data.get(str(USERID), data)
+            if not data.get("state", None):
+                logger.info(f"服务器状态{res_data}")
+                bonus = random.randint(
+                    max(int(BONUS_MIN), 1), max(
+                        int(BONUS_MIN), int(BONUS_MAX), 1)
+                )*1000
+                logger.info(f"开局{bonus}")
+                data["point"] = do_game(bonus)
+                data["bonus"] = bonus
+                data["state"] = 1
+                logger.info(f"上报点数{data}")
+                res_data = post_state(url, data)
+                logger.info(f"更新服务器状态{res_data}")
             random_sleep(1)
         else:
             gevent.sleep(60)
@@ -105,9 +100,8 @@ def help_friends():
                                     logger.info(f"上传平局结果")
                                 else:
                                     logger.warning(f"未找到对局，等待服务器更新数据")
-                                with lock:
-                                    friend_data["point"] = None
-                                    friend_data["state"] = None
+                                friend_data["point"] = None
+                                friend_data["state"] = None
                                 res_data = post_state(url, friend_data)
                                 break
             random_sleep(FAST_SLEEP_TIME)
