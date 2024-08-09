@@ -58,6 +58,7 @@ def parse_form_from_html(soup):
     for input_tag in soup.find_all("input"):
         if "name" in input_tag.attrs:
             form_elements[input_tag["name"]] = input_tag["value"]
+    logger.info(f"找到平局信息：{form_elements},开始平局")
     return form_elements
 
 
