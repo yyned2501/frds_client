@@ -106,10 +106,10 @@ def help_friends():
                                     'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
                                 if boom_game(boom_data, USERID):
                                     logger.info(f"上传平局结果")
+                                    friend_data["state"] = None
+                                    res_data = post_state(url, friend_data)
                                 else:
                                     logger.warning(f"未找到对局，等待服务器更新数据")
-                                friend_data["state"] = None
-                                res_data = post_state(url, friend_data)
                                 break
             random_sleep(FAST_SLEEP_TIME)
         else:

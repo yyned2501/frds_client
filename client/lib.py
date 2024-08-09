@@ -141,15 +141,17 @@ def boom_game(boom_data, my_userid):
     stop_data = {"game": "stop", "userid": my_userid}
 
     s = game(start_data)
+    # if not s:
+    #     start_data = find_game(boom_data["userid"])
+    #     if not start_data:
+    #         logger.warn(f"平局：对局已结束")
+    #         return None
+    #     s = game(start_data) or game(continue_data)
     if not s:
-        start_data = find_game(boom_data["userid"])
-        if not start_data:
-            logger.warn(f"平局：对局已结束")
-            return None
-        s = game(start_data) or game(continue_data)
-        if not s:
-            logger.warn(f"平局：对局被人抢了")
-            return None
+        logger.warn(f"平局：对局被人抢了")
+        if game(continue_data):
+            game(stop_data)
+        return None
     while s < 21:
         logger.info(f"平局：当前点数{s}，继续抓牌")
         s = game(hit_data)
