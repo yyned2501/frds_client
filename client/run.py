@@ -62,7 +62,6 @@ def start_my_game():
     global data
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/state"
-
     while 1:
         if work_time():
             with lock:
@@ -78,7 +77,8 @@ def start_my_game():
                     data["state"] = 1
                     logger.info(f"上报点数{data}")
                     res_data = post_state(url, data)
-                    data = res_data.get(str(USERID), data)
+                    logger.info(f"更新服务器状态{res_data}")
+                    # data = res_data.get(str(USERID), data)
             random_sleep(1)
         else:
             gevent.sleep(60)
