@@ -1,3 +1,4 @@
+import time
 import monkey
 import requests
 from bs4 import BeautifulSoup
@@ -34,7 +35,7 @@ def get_state(url) -> dict[str, dict]:
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            traceback.print_exc()
+            # traceback.print_exc()
 
 
 def post_state(url, data) -> dict:
@@ -53,7 +54,7 @@ def post_state(url, data) -> dict:
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            traceback.print_exc()
+            # traceback.print_exc()
 
 
 def parse_form_from_html(soup):
@@ -72,7 +73,8 @@ def find_game(userid):
             with requests.get(url, headers=headers) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
-                    forms = soup.select("#game_available tr td:nth-of-type(4) form")
+                    forms = soup.select(
+                        "#game_available tr td:nth-of-type(4) form")
                     for form in forms:
                         if form.find("input", value=str(userid)):
                             return parse_form_from_html(form)
@@ -82,7 +84,7 @@ def find_game(userid):
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            traceback.print_exc()
+            # traceback.print_exc()
 
 
 def my_game_state():
@@ -101,7 +103,7 @@ def my_game_state():
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            traceback.print_exc()
+            # traceback.print_exc()
 
 
 def game(data):
@@ -120,14 +122,15 @@ def game(data):
                             point = 0
                         return point
                     else:
-                        logger.error(soup.prettify())
+                        with open(f"error_page_{int(time.time())}.html", "w") as f:
+                            f.write(soup.prettify())
                         return None
                 else:
                     raise (response.status_code)
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            traceback.print_exc()
+            # traceback.print_exc()
     return 22
 
 
@@ -155,7 +158,8 @@ def boom_game(userid, my_userid):
 
 
 def do_game(amount=100):
-    start_data = {"game": "hit", "start": "yes", "amount": amount, "downloads": 0}
+    start_data = {"game": "hit", "start": "yes",
+                  "amount": amount, "downloads": 0}
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
