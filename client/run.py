@@ -56,7 +56,7 @@ def post_frds_states():
     while 1:
         if work_time():
             state = game_state(USERID)
-            p_data = {"data": state}
+            p_data = {"data": state, "userid": USERID, "sleep": NORMAL_SLEEP_TIME}
             logger.info(f"在线游戏{state}")
             if state:
                 if str(USERID) in state:
@@ -65,8 +65,8 @@ def post_frds_states():
                     data["state"] = None
                     data["point"] = None
                 res_data = post_state(url, p_data)
-                data = res_data.get(str(USERID), data)
-                res_data = post_state(SERVER, data)
+                # data = res_data.get(str(USERID), data)
+                # res_data = post_state(SERVER, data)
                 logger.info(f"更新服务器状态{res_data}")
             random_sleep(NORMAL_SLEEP_TIME)
         else:
