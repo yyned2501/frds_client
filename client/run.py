@@ -66,7 +66,7 @@ def start_my_game():
     while 1:
         if work_time():
             with lock:
-                if not data["state"]:
+                if not data.get("state", None):
                     logger.info(f"服务器状态{res_data}")
                     bonus = random.randint(
                         max(int(BONUS_MIN), 1), max(
