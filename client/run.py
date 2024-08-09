@@ -37,24 +37,24 @@ def post_frds_states():
     global data
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/states"
-    with lock:
-        while 1:
-            if work_time():
-                state = game_state(USERID)
-                p_data = {"data": state, "userid": USERID,
-                          "sleep": NORMAL_SLEEP_TIME}
-                logger.info(f"在线游戏{state}")
-                if state:
+    while 1:
+        if work_time():
+            state = game_state(USERID)
+            p_data = {"data": state, "userid": USERID,
+                      "sleep": NORMAL_SLEEP_TIME}
+            logger.info(f"在线游戏{state}")
+            if state:
+                with lock:
                     if str(USERID) in state:
                         data["state"] = 1
                     else:
                         data["state"] = None
                         data["point"] = None
-                    res_data = post_state(url, p_data)
-                    logger.info(f"更新服务器状态{res_data}")
-                random_sleep(NORMAL_SLEEP_TIME)
-            else:
-                time.sleep(60)
+                res_data = post_state(url, p_data)
+                logger.info(f"更新服务器状态{res_data}")
+            random_sleep(NORMAL_SLEEP_TIME)
+        else:
+            time.sleep(60)
 
 
 def start_my_game():
@@ -62,10 +62,10 @@ def start_my_game():
     global data
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/state"
-    with lock:
-        while 1:
-            if work_time():
-                # 未开局
+
+    while 1:
+        if work_time():
+            with lock:
                 if not res_data.get(str(USERID), {"state": 1}).get("state", None):
                     logger.info(f"服务器状态{res_data}")
                     point = random.randint(
@@ -76,9 +76,9 @@ def start_my_game():
                     data["point"] = do_game(point * 1000)
                     data["state"] = 1
                     res_data = post_state(url, data)
-                random_sleep(1)
-            else:
-                gevent.sleep(60)
+            random_sleep(1)
+        else:
+            gevent.sleep(60)
 
 
 def help_friends():
@@ -86,30 +86,30 @@ def help_friends():
     global data
     url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
     url += "/api/state"
-    with lock:
-        while 1:
-            if work_time():
-                res_data = get_state(url)
-                data = res_data.get(str(USERID), data)
-                for key_id in res_data:
-                    if key_id != str(USERID):
-                        friend_data = res_data.get(key_id, None)
-                        if friend_data:
-                            if friend_data.get("state", None):
-                                if int(friend_data.get("point", 0)) > 21:
-                                    logger.info(f"服务器状态{res_data}")
-                                    logger.info(f"好友{key_id}点数超过21，开始平局")
-                                    if boom_game(key_id, USERID):
-                                        logger.info(f"上传平局结果")
-                                    else:
-                                        logger.warning(f"未找到对局，等待服务器更新数据")
+    while 1:
+        if work_time():
+            res_data = get_state(url)
+            data = res_data.get(str(USERID), data)
+            for key_id in res_data:
+                if key_id != str(USERID):
+                    friend_data = res_data.get(key_id, None)
+                    if friend_data:
+                        if friend_data.get("state", None):
+                            if int(friend_data.get("point", 0)) > 21:
+                                logger.info(f"服务器状态{res_data}")
+                                logger.info(f"好友{key_id}点数超过21，开始平局")
+                                if boom_game(key_id, USERID):
+                                    logger.info(f"上传平局结果")
+                                else:
+                                    logger.warning(f"未找到对局，等待服务器更新数据")
+                                with lock:
                                     friend_data["point"] = None
                                     friend_data["state"] = None
-                                    res_data = post_state(url, friend_data)
-                                    break
-                random_sleep(FAST_SLEEP_TIME)
-            else:
-                gevent.sleep(60 * 10)
+                                res_data = post_state(url, friend_data)
+                                break
+            random_sleep(FAST_SLEEP_TIME)
+        else:
+            gevent.sleep(60 * 10)
 
 
 def run():
