@@ -15,6 +15,9 @@ from log import logger
 
 res_data = {}
 data = {"userid": USERID, "state": 1, "sleep": NORMAL_SLEEP_TIME}
+SERVER = SERVER[:-1] if SERVER[-1] == "/" else SERVER
+STATE_URL = SERVER + "/api/state"
+STATES_URL = SERVER + "/api/states"
 
 
 def work_time():
@@ -33,8 +36,6 @@ def random_sleep(sleep_sec):
 def post_frds_states():
     global res_data
     global data
-    url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
-    url += "/api/states"
     while 1:
         if work_time():
             state = game_state(USERID)
@@ -47,7 +48,7 @@ def post_frds_states():
                 else:
                     data["state"] = None
                     data["point"] = None
-                res_data = post_state(url, p_data)
+                res_data = post_state(STATES_URL, p_data)
                 logger.info(f"更新服务器状态{res_data}")
             random_sleep(NORMAL_SLEEP_TIME)
         else:
@@ -57,23 +58,27 @@ def post_frds_states():
 def start_my_game():
     global res_data
     global data
-    url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
-    url += "/api/state"
     while 1:
         if work_time():
             if not data.get("state", None):
                 logger.info(f"服务器状态{res_data}")
-                bonus = random.randint(
-                    max(int(BONUS_MIN), 1), max(
-                        int(BONUS_MIN), int(BONUS_MAX), 1)
-                )*1000
-                logger.info(f"开局{bonus}")
-                data["point"] = do_game(bonus)
-                data["bonus"] = bonus
-                data["state"] = 1
-                logger.info(f"上报点数{data}")
-                res_data = post_state(url, data)
-                logger.info(f"更新服务器状态{res_data}")
+                state = game_state(USERID)  # 本地校验状态
+                if state:
+                    if str(USERID) in state:
+                        data["state"] = 1
+                        res_data = post_state(STATE_URL, data)
+                    else:
+                        bonus = random.randint(
+                            max(int(BONUS_MIN), 1), max(
+                                int(BONUS_MIN), int(BONUS_MAX), 1)
+                        )*1000
+                        logger.info(f"开局{bonus}")
+                        data["point"] = do_game(bonus)
+                        data["bonus"] = bonus
+                        data["state"] = 1
+                        logger.info(f"上报点数{data}")
+                        res_data = post_state(STATE_URL, data)
+                        logger.info(f"更新服务器状态{res_data}")
             random_sleep(1)
         else:
             gevent.sleep(60)
