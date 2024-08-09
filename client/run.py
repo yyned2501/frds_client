@@ -66,16 +66,19 @@ def start_my_game():
     while 1:
         if work_time():
             with lock:
-                if not res_data.get(str(USERID), {"state": 1}).get("state", None):
+                if not data["state"]:
                     logger.info(f"服务器状态{res_data}")
-                    point = random.randint(
+                    bonus = random.randint(
                         max(int(BONUS_MIN), 1), max(
                             int(BONUS_MIN), int(BONUS_MAX), 1)
-                    )
-                    logger.info(f"开局{point * 1000}")
-                    data["point"] = do_game(point * 1000)
+                    )*1000
+                    logger.info(f"开局{bonus}")
+                    data["point"] = do_game(bonus)
+                    data["bonus"] = bonus
                     data["state"] = 1
+                    logger.info(f"上报点数{data}")
                     res_data = post_state(url, data)
+                    data = res_data.get(str(USERID), data)
             random_sleep(1)
         else:
             gevent.sleep(60)
