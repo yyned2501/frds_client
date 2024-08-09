@@ -114,6 +114,8 @@ def game(data):
                             point = 0
                         return point
                     else:
+                        element = soup.select_one("table table")
+                        logger.error(element.prettify() or soup.prettify())
                         return None
                 else:
                     raise (response.status_code)
