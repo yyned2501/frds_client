@@ -29,25 +29,6 @@ def random_sleep(sleep_sec):
     time.sleep(random.randint(int(sleep_sec / 2), sleep_sec))
 
 
-def start_my_game():
-    global res_data
-    global data
-    while 1:
-        if work_time():
-            if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
-                logger.info(f"服务器状态{res_data}")
-                point = random.randint(
-                    max(int(BONUS_MIN), 1), max(int(BONUS_MIN), int(BONUS_MAX), 1)
-                )
-                logger.info(f"开局{point * 1000}")
-                data["point"] = do_game(point * 1000)
-                data["state"] = 1
-                res_data = post_state(SERVER, data)
-            random_sleep(1)
-        else:
-            time.sleep(60)
-
-
 def post_frds_states():
     global res_data
     global data
@@ -65,10 +46,29 @@ def post_frds_states():
                     data["state"] = None
                     data["point"] = None
                 res_data = post_state(url, p_data)
-                # data = res_data.get(str(USERID), data)
-                # res_data = post_state(SERVER, data)
                 logger.info(f"更新服务器状态{res_data}")
             random_sleep(NORMAL_SLEEP_TIME)
+        else:
+            time.sleep(60)
+
+
+def start_my_game():
+    global res_data
+    global data
+    url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
+    url += "/api/state"
+    while 1:
+        if work_time():
+            if not res_data.get(str(USERID), {"state": 1}).get("state", None):  # 未开局
+                logger.info(f"服务器状态{res_data}")
+                point = random.randint(
+                    max(int(BONUS_MIN), 1), max(int(BONUS_MIN), int(BONUS_MAX), 1)
+                )
+                logger.info(f"开局{point * 1000}")
+                data["point"] = do_game(point * 1000)
+                data["state"] = 1
+                res_data = post_state(url, data)
+            random_sleep(1)
         else:
             time.sleep(60)
 
@@ -76,6 +76,8 @@ def post_frds_states():
 def help_friends():
     global res_data
     global data
+    url = SERVER[:-1] if SERVER[-1] == "/" else SERVER
+    url += "/api/state"
     while 1:
         if work_time():
             res_data = get_state(SERVER)
@@ -94,7 +96,7 @@ def help_friends():
                                     logger.warning(f"未找到对局，等待服务器更新数据")
                                 friend_data["point"] = None
                                 friend_data["state"] = None
-                                res_data = post_state(SERVER, friend_data)
+                                res_data = post_state(url, friend_data)
                                 break
             random_sleep(FAST_SLEEP_TIME)
         else:
