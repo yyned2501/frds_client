@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from config import COOKIE, REMAIN_POINT
 from log import logger
+import traceback
 
 url = "https://pt.keepfrds.com/blackjack.php"
 headers = {
@@ -33,6 +34,7 @@ def get_state(url) -> dict[str, dict]:
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+            traceback.print_exc()
 
 
 def post_state(url, data) -> dict:
@@ -51,6 +53,7 @@ def post_state(url, data) -> dict:
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+            traceback.print_exc()
 
 
 def parse_form_from_html(soup):
@@ -79,6 +82,7 @@ def find_game(userid):
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+            traceback.print_exc()
 
 
 def my_game_state():
@@ -97,6 +101,7 @@ def my_game_state():
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+            traceback.print_exc()
 
 
 def game(data):
@@ -121,6 +126,7 @@ def game(data):
         except:
             error += 1
             logger.error(f"请求错误{error}次")
+            traceback.print_exc()
     return 22
 
 
