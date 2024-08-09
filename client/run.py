@@ -80,7 +80,7 @@ def help_friends():
     url += "/api/state"
     while 1:
         if work_time():
-            res_data = get_state(SERVER)
+            res_data = get_state(url)
             data = res_data.get(str(USERID), data)
             for key_id in res_data:
                 if key_id != str(USERID):
