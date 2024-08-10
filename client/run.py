@@ -100,7 +100,8 @@ def help_friends():
     while 1:
         if work_time():
             res_data = get_state(url)
-            data = res_data.get(str(USERID), data)
+            if res_data:
+                data = res_data.get(str(USERID), data)
             if data.get("state", None):
                 for key_id in res_data:
                     if key_id != str(USERID):
