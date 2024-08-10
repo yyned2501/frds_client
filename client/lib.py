@@ -161,6 +161,9 @@ def boom_game(boom_data, my_userid):
             logger.warning(f"平局：上局未结束，无法获知对局对象，直接结束")
             game(stop_data)
             return None
+        else:
+            logger.warning("平局：月月链接错误，稍后重试")
+            return None
     while s < 21:
         logger.info(f"平局：当前点数{s}，继续抓牌")
         s_, e = game(hit_data)
