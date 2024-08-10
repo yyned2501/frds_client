@@ -111,6 +111,7 @@ def help_friends():
                                     'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
                                 if boom_game(boom_data, USERID):
                                     logger.info(f"上传平局结果")
+                                    friend_data["point"] = None
                                     friend_data["state"] = None
                                     res_data = post_state(url, friend_data)
                                     break
