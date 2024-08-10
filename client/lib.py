@@ -124,13 +124,13 @@ def game(data):
                             point = 0
                         return point, None
                     else:
-                        if SAVE_ERR_PAGE:
-                            element = soup.select_one(
-                                "#outer table table td") or soup.select_one("form strong")
-                            if element:
-                                logger.warning(element.text)
-                                return None, element.text
-                            else:
+                        element = soup.select_one(
+                            "#outer table table td") or soup.select_one("form strong")
+                        if element:
+                            logger.warning(element.text)
+                            return None, element.text
+                        else:
+                            if SAVE_ERR_PAGE:
                                 if not os.path.exists("error_pages"):
                                     os.makedirs("error_pages")
                                 with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
@@ -192,7 +192,7 @@ def do_game(amount=100):
         if e == "您需要等待上一局结束":
             return
         elif e == "您必须先完成当前的游戏。":
-            return 
+            return
     while s < REMAIN_POINT:
         logger.info(f"当前点数{s}，继续抓牌")
         s_, e = game(hit_data)
