@@ -242,7 +242,7 @@ def game_state(userid):
 
 if __name__ == "__main__":
     s = {
-        'game': 'hit', 'start': 'yes', 'userid': 31341, 'amount': 1000, 'downloads': '0'}
+        'game': 'hit', 'start': 'yes', 'userid': 39819, 'amount': 1000, 'downloads': '0'}
     start_data = {"game": "hit", "start": "yes",
                   "amount": 1000, "downloads": 0}
     hit_data = {"game": "hit", "userid": 0}

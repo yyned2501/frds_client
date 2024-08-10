@@ -33,23 +33,27 @@ def random_sleep(sleep_sec):
     gevent.sleep(random.random()*half_sec+half_sec)
 
 
-def post_frds_states():
+def post_frds_states_():
     global res_data
     global data
+    state = game_state(USERID)
+    p_data = {"data": state, "userid": USERID,
+              "sleep": NORMAL_SLEEP_TIME}
+    logger.info(f"在线游戏{state}")
+    if state:
+        if str(USERID) in state:
+            data["state"] = 1
+        else:
+            data["state"] = None
+            data["point"] = None
+        res_data = post_state(STATES_URL, p_data)
+        logger.info(f"更新服务器状态{res_data}")
+
+
+def post_frds_states():
     while 1:
         if work_time():
-            state = game_state(USERID)
-            p_data = {"data": state, "userid": USERID,
-                      "sleep": NORMAL_SLEEP_TIME}
-            logger.info(f"在线游戏{state}")
-            if state:
-                if str(USERID) in state:
-                    data["state"] = 1
-                else:
-                    data["state"] = None
-                    data["point"] = None
-                res_data = post_state(STATES_URL, p_data)
-                logger.info(f"更新服务器状态{res_data}")
+            post_frds_states_()
             random_sleep(NORMAL_SLEEP_TIME)
         else:
             time.sleep(60)
@@ -82,8 +86,7 @@ def start_my_game():
                             res_data = post_state(STATE_URL, data)
                             logger.info(f"更新服务器状态{res_data}")
                         else:
-                            logger.warning("开局未知错误，20秒后重试")
-                            random_sleep(20)
+                            logger.error("开局未知错误，等待重试")
             random_sleep(1)
         else:
             gevent.sleep(60)
@@ -118,6 +121,7 @@ def help_friends():
                                         break
                                     else:
                                         logger.warning(f"未找到对局，等待服务器更新数据")
+                                        post_frds_states_()
 
             random_sleep(FAST_SLEEP_TIME)
         else:
