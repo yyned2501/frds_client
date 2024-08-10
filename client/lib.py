@@ -129,6 +129,7 @@ def game(data):
                             with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
                                 f.write(soup.prettify())
                         logger.error("未能获取到页面点数，返回None")
+                        return None
                 else:
                     raise (response.status_code)
         except:
@@ -218,4 +219,6 @@ def game_state(userid):
 
 
 if __name__ == "__main__":
-    print(game_state(0))
+    start_data = {"game": "hit", "start": "yes",
+                  "amount": 1000, "downloads": 0}
+    game(start_data)
