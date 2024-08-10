@@ -98,25 +98,26 @@ def help_friends():
         if work_time():
             res_data = get_state(url)
             data = res_data.get(str(USERID), data)
-            for key_id in res_data:
-                if key_id != str(USERID):
-                    friend_data = res_data.get(key_id, None)
-                    if friend_data:
-                        if friend_data.get("state", None):
-                            if int(friend_data.get("point", 0)) > 21:
-                                logger.info(f"服务器状态{res_data}")
-                                logger.info(f"好友{key_id}点数超过21，开始平局")
-                                bonus = friend_data.get("bonus", 100)
-                                boom_data = {
-                                    'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
-                                if boom_game(boom_data, USERID):
-                                    logger.info(f"上传平局结果")
-                                    friend_data["point"] = None
-                                    friend_data["state"] = None
-                                    res_data = post_state(url, friend_data)
-                                    break
-                                else:
-                                    logger.warning(f"未找到对局，等待服务器更新数据")
+            if data.get("state", None):
+                for key_id in res_data:
+                    if key_id != str(USERID):
+                        friend_data = res_data.get(key_id, None)
+                        if friend_data:
+                            if friend_data.get("state", None):
+                                if int(friend_data.get("point", 0)) > 21:
+                                    logger.info(f"服务器状态{res_data}")
+                                    logger.info(f"好友{key_id}点数超过21，开始平局")
+                                    bonus = friend_data.get("bonus", 100)
+                                    boom_data = {
+                                        'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
+                                    if boom_game(boom_data, USERID):
+                                        logger.info(f"上传平局结果")
+                                        friend_data["point"] = None
+                                        friend_data["state"] = None
+                                        res_data = post_state(url, friend_data)
+                                        break
+                                    else:
+                                        logger.warning(f"未找到对局，等待服务器更新数据")
 
             random_sleep(FAST_SLEEP_TIME)
         else:
