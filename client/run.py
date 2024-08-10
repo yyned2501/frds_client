@@ -39,7 +39,7 @@ def post_frds_states_():
     state = game_state(USERID)
     p_data = {"data": state, "userid": USERID,
               "sleep": NORMAL_SLEEP_TIME}
-    # logger.info(f"在线游戏{state}")
+    logger.info(f"在线游戏{state}")
     if state:
         if str(USERID) in state:
             data["state"] = 1
