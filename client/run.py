@@ -73,12 +73,17 @@ def start_my_game():
                                 int(BONUS_MIN), int(BONUS_MAX), 1)
                         )*1000
                         logger.info(f"开局{bonus}")
-                        data["point"] = do_game(bonus)
-                        data["bonus"] = bonus
-                        data["state"] = 1
-                        logger.info(f"上报点数{data}")
-                        res_data = post_state(STATE_URL, data)
-                        logger.info(f"更新服务器状态{res_data}")
+                        p = do_game(bonus)
+                        if p:
+                            data["point"] = p
+                            data["bonus"] = bonus
+                            data["state"] = 1
+                            logger.info(f"上报点数{data}")
+                            res_data = post_state(STATE_URL, data)
+                            logger.info(f"更新服务器状态{res_data}")
+                        else:
+                            logger.warning("开局未知错误，20秒后重试")
+                            random_sleep(20)
             random_sleep(1)
         else:
             gevent.sleep(60)
@@ -101,16 +106,17 @@ def help_friends():
                             if int(friend_data.get("point", 0)) > 21:
                                 logger.info(f"服务器状态{res_data}")
                                 logger.info(f"好友{key_id}点数超过21，开始平局")
-                                bonus = friend_data.get("bonus", 0)
+                                bonus = friend_data.get("bonus", 100)
                                 boom_data = {
                                     'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
                                 if boom_game(boom_data, USERID):
                                     logger.info(f"上传平局结果")
                                     friend_data["state"] = None
                                     res_data = post_state(url, friend_data)
+                                    break
                                 else:
                                     logger.warning(f"未找到对局，等待服务器更新数据")
-                                break
+
             random_sleep(FAST_SLEEP_TIME)
         else:
             gevent.sleep(60 * 10)

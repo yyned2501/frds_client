@@ -122,12 +122,14 @@ def game(data):
                         except:
                             logger.error("未能获取到页面点数，返回0")
                             point = 0
-                        return point
+                        return point, None
                     else:
                         if SAVE_ERR_PAGE:
-                            element = soup.select_one("#outer table table td")
+                            element = soup.select_one(
+                                "#outer table table td") or soup.select_one("form strong")
                             if element:
-                                logger.error(element.text)
+                                logger.warning(element.text)
+                                return None, element.text
                             else:
                                 if not os.path.exists("error_pages"):
                                     os.makedirs("error_pages")
@@ -135,13 +137,13 @@ def game(data):
                                     f.write(soup.prettify())
                                 logger.error("未知错误,已将页面保存至error_pages文件夹")
                         logger.error("未能获取到页面点数，返回None")
-                        return None
+                        return None, None
                 else:
                     raise (response.status_code)
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-    return 22
+    return None, None
 
 
 def boom_game(boom_data, my_userid):
@@ -150,15 +152,27 @@ def boom_game(boom_data, my_userid):
     hit_data = {"game": "hit", "userid": my_userid}
     stop_data = {"game": "stop", "userid": my_userid}
 
-    s = game(start_data)
+    s, e = game(start_data)
     if not s:
-        logger.warn(f"平局：对局被人抢了")
-        if game(continue_data):
+        if e == "该对局已结束":
+            logger.warning(f"平局：对局被人抢了")
+            return None
+        elif e == "您必须先完成当前的游戏。":
+            logger.warning(f"平局：上局未结束，无法获知对局对象，直接结束")
             game(stop_data)
-        return None
+            return None
     while s < 21:
         logger.info(f"平局：当前点数{s}，继续抓牌")
-        s = game(hit_data)
+        s_, e = game(hit_data)
+        if s_:
+            s = s_
+        else:
+            if e == "Starship":
+                logger.warn("平局：对局已结束")
+                return None
+            logger.error("平局：获取对局数据失败，直接结束")
+            game(stop_data)
+            return None
     if s == 21:
         logger.info(f"平局：当前点数{s}，平局失败")
         return s
@@ -173,20 +187,29 @@ def do_game(amount=100):
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
-    s = game(start_data)
+    s, e = game(start_data)
     if not s:
-        s = game(continue_data)
-    if not s:
-        logger.info("上一场未结束")
-        return
+        if e == "您需要等待上一局结束":
+            return
+        elif e == "您必须先完成当前的游戏。":
+            s, e = game(continue_data)
     while s < REMAIN_POINT:
         logger.info(f"当前点数{s}，继续抓牌")
-        s = game(hit_data) or 22
+        s_, e = game(hit_data)
+        if s_:
+            s = s_
+        else:
+            if e == "Starship":
+                logger.warn("当前点数{s}，对局已结束")
+                return s
+            else:
+                logger.error("当前点数{s}，访问错误，等待重试")
+                return None
     if s == 21:
         logger.info(f"当前点数{s}，完美")
     elif s < 21:
         logger.info(f"当前点数{s}，停止抓牌")
-        game(stop_data)
+        s, e = game(stop_data)
     else:
         logger.info(f"当前点数{s}，爆了")
     return s
@@ -222,4 +245,6 @@ if __name__ == "__main__":
         'game': 'hit', 'start': 'yes', 'userid': 39819, 'amount': 1000, 'downloads': '0'}
     start_data = {"game": "hit", "start": "yes",
                   "amount": 1000, "downloads": 0}
-    print(game(s))
+    hit_data = {"game": "hit", "userid": 0}
+    game(hit_data)
+    # print(boom_game(s, 40074))
