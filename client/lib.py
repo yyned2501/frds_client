@@ -192,10 +192,7 @@ def do_game(amount=100):
     stop_data = {"game": "stop", "userid": 0}
     s, e = game(start_data)
     if not s:
-        if e == "您需要等待上一局结束":
-            return
-        elif e == "您必须先完成当前的游戏。":
-            return
+        return
     while s < REMAIN_POINT:
         logger.info(f"当前点数{s}，继续抓牌")
         s_, e = game(hit_data)
