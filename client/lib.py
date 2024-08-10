@@ -3,7 +3,7 @@ import time
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, REMAIN_POINT,SAVE_ERR_PAGE
+from config import COOKIE, REMAIN_POINT, SAVE_ERR_PAGE
 from log import logger
 import traceback
 
@@ -27,7 +27,7 @@ def get_state(url) -> dict[str, dict]:
     error = 0
     while error < 3:
         try:
-            with requests.get(url) as r:
+            with requests.get(url, timeout=5) as r:
                 if r.status_code == 200:
                     return r.json()
                 else:
@@ -43,7 +43,7 @@ def post_state(url, data) -> dict:
     error = 0
     while error < 3:
         try:
-            with requests.post(url, data=data) as r:
+            with requests.post(url, data=data, timeout=5) as r:
                 if r.status_code == 200:
                     rd = r.json()
                     # logger.info(rd)
@@ -120,14 +120,20 @@ def game(data):
                         try:
                             point = int(text.split("=")[-1])
                         except:
+                            logger.error("未能获取到页面点数，返回0")
                             point = 0
                         return point
                     else:
                         if SAVE_ERR_PAGE:
-                            if not os.path.exists("error_pages"):  
-                                os.makedirs("error_pages")  
-                            with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
-                                f.write(soup.prettify())
+                            element = soup.select_one("#outer table table td")
+                            if element:
+                                logger.error(element.text)
+                            else:
+                                if not os.path.exists("error_pages"):
+                                    os.makedirs("error_pages")
+                                with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
+                                    f.write(soup.prettify())
+                                logger.error("未知错误,已将页面保存至error_pages文件夹")
                         logger.error("未能获取到页面点数，返回None")
                         return None
                 else:
@@ -135,7 +141,6 @@ def game(data):
         except:
             error += 1
             logger.error(f"请求错误{error}次")
-            # traceback.print_exc()
     return 22
 
 
@@ -146,12 +151,6 @@ def boom_game(boom_data, my_userid):
     stop_data = {"game": "stop", "userid": my_userid}
 
     s = game(start_data)
-    # if not s:
-    #     start_data = find_game(boom_data["userid"])
-    #     if not start_data:
-    #         logger.warn(f"平局：对局已结束")
-    #         return None
-    #     s = game(start_data) or game(continue_data)
     if not s:
         logger.warn(f"平局：对局被人抢了")
         if game(continue_data):
@@ -219,6 +218,8 @@ def game_state(userid):
 
 
 if __name__ == "__main__":
+    s = {
+        'game': 'hit', 'start': 'yes', 'userid': 39819, 'amount': 1000, 'downloads': '0'}
     start_data = {"game": "hit", "start": "yes",
                   "amount": 1000, "downloads": 0}
-    game(start_data)
+    print(game(s))
