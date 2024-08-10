@@ -194,7 +194,10 @@ def do_game(amount=100):
     stop_data = {"game": "stop", "userid": 0}
     s, e = game(start_data)
     if not s:
-        return
+        if e == "您必须先完成当前的游戏。":
+            s, e = game(continue_data)
+        else:
+            return
     while s < REMAIN_POINT:
         logger.info(f"当前点数{s}，继续抓牌")
         s_, e = game(hit_data)
@@ -244,7 +247,8 @@ def game_state(userid):
 
 
 if __name__ == "__main__":
-    s = {'game': 'hit', 'start': 'yes', 'userid': 31341, 'amount': 1000, 'downloads': '0'}
+    s = {'game': 'hit', 'start': 'yes', 'userid': 31341,
+         'amount': 1000, 'downloads': '0'}
     start_data = {"game": "hit", "start": "yes",
                   "amount": 1000, "downloads": 0}
     hit_data = {"game": "hit", "userid": 0}
