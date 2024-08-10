@@ -39,7 +39,7 @@ def post_frds_states_():
     state = game_state(USERID)
     p_data = {"data": state, "userid": USERID,
               "sleep": NORMAL_SLEEP_TIME}
-    logger.info(f"在线游戏{state}")
+    # logger.info(f"在线游戏{state}")
     if state:
         if str(USERID) in state:
             data["state"] = 1
@@ -84,7 +84,7 @@ def start_my_game():
                             data["state"] = 1
                             logger.info(f"上报点数{data}")
                             res_data = post_state(STATE_URL, data)
-                            logger.info(f"更新服务器状态{res_data}")
+                            # logger.info(f"更新后服务器状态{res_data}")
                         else:
                             logger.error("开局未知错误，等待重试")
             random_sleep(1)
@@ -122,7 +122,10 @@ def help_friends():
                                     else:
                                         logger.warning(f"未找到对局，等待服务器更新数据")
                                         post_frds_states_()
-
+            else:
+                logger.warning("完成开局后帮助好友")
+                logger.info(f"当前服务器状态{res_data}")
+                logger.info(f"当前个人状态{data}")
             random_sleep(FAST_SLEEP_TIME)
         else:
             gevent.sleep(60 * 10)
