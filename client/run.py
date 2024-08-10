@@ -126,6 +126,7 @@ def help_friends():
                 logger.warning("完成开局后帮助好友")
                 logger.info(f"当前服务器状态{res_data}")
                 logger.info(f"当前个人状态{data}")
+                
             random_sleep(FAST_SLEEP_TIME)
         else:
             gevent.sleep(60 * 10)

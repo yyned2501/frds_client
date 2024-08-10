@@ -1,9 +1,11 @@
 import os
 import time
+
+import gevent
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, REMAIN_POINT, SAVE_ERR_PAGE
+from config import COOKIE, FAST_SLEEP_TIME, REMAIN_POINT, SAVE_ERR_PAGE
 from log import logger
 import traceback
 
@@ -238,6 +240,7 @@ def game_state(userid):
             logger.error(e)
             error += 1
             logger.error(f"请求错误{error}次")
+            gevent.sleep(3)
 
 
 if __name__ == "__main__":
