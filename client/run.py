@@ -119,7 +119,7 @@ def help_friends():
                     #             if int(friend_data.get("point", 0)) > 21:
                     if len(friend_need_help) > 0:
                         logger.info(f"服务器状态{res_data}")
-                        key_id = random.choice(friend_data)
+                        key_id = random.choice(friend_need_help)
                         friend_data = res_data[key_id]
                         logger.info(
                             f"好友{friend_need_help}需要帮助，随机选择{key_id}开始帮助")
@@ -142,7 +142,7 @@ def help_friends():
 
             random_sleep(FAST_SLEEP_TIME)
         else:
-            gevent.sleep(60 * 10)
+            gevent.sleep(60)
 
 
 def run():
