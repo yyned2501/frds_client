@@ -1,11 +1,12 @@
 import os
+import random
 import time
 
 import gevent
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, FAST_SLEEP_TIME, REMAIN_POINT, SAVE_ERR_PAGE
+from config import COOKIE, FAST_SLEEP_TIME, REMAIN_POINT, REMAIN_POINT_LOW, REMAIN_POINT_LOW_P, SAVE_ERR_PAGE
 from log import logger
 import traceback
 
@@ -189,13 +190,15 @@ def do_game(amount=100):
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
+    remain_point = REMAIN_POINT if random.random(
+    ) > REMAIN_POINT_LOW_P else REMAIN_POINT_LOW
     s, e = game(start_data)
     if not s:
         if e == "您必须先完成当前的游戏。":
             s, e = game(continue_data)
         else:
             return
-    while s < REMAIN_POINT:
+    while s < remain_point:
         logger.info(f"当前点数{s}，继续抓牌")
         s_, e = game(hit_data)
         if s_:
