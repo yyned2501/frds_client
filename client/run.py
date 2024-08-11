@@ -107,7 +107,7 @@ def help_friends():
                     if (
                         (key_id in res_data)
                         and (key_id != str(USERID))
-                        and (not res_data[key_id].get("state"))
+                        and res_data[key_id].get("state")
                         and (int(res_data[key_id].get("point", 0)) > 21)
                     )]
                 if data.get("state"):
