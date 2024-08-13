@@ -22,10 +22,10 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
     "X-Requested-With": "XMLHttpRequest",
 }
+proxies = {"http": PROXY, "https": PROXY} if PROXY else None
 
 
 def get_state(url) -> dict[str, dict]:
-    proxies = {"http": PROXY, "https": PROXY} if PROXY else None
     error = 0
     while error < 3:
         try:
@@ -41,7 +41,6 @@ def get_state(url) -> dict[str, dict]:
 
 
 def post_state(url, data) -> dict:
-    proxies = {"http": PROXY, "https": PROXY} if PROXY else None
     error = 0
     while error < 3:
         try:
@@ -87,30 +86,11 @@ def find_game(userid):
             # traceback.print_exc()
 
 
-def my_game_state():
-    error = 0
-    while error < 3:
-        try:
-            with requests.get(url, headers=headers) as response:
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, "lxml")
-                    forms = soup.select("#details tr")
-                    if forms and forms[-1].text.strip() == "请等待上局结束":
-                        return 1
-                    return None
-                else:
-                    raise (response.status_code)
-        except:
-            error += 1
-            logger.error(f"请求错误{error}次")
-            # traceback.print_exc()
-
-
 def game(data):
     error = 0
     while error < 3:
         try:
-            with requests.post(url, headers=headers, data=data) as response:
+            with requests.post(url, headers=headers, data=data, proxies=proxies) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     element = soup.select_one("#details b")
@@ -224,7 +204,7 @@ def game_state(userid):
     state = []
     while error < 3:
         try:
-            with requests.get(url, headers=headers) as response:
+            with requests.get(url, headers=headers, proxies=proxies) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     inputs = soup.select(
