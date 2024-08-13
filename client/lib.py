@@ -1,15 +1,13 @@
+import monkey
+import requests
+from bs4 import BeautifulSoup
+from config import COOKIE, REMAIN_POINT, REMAIN_POINT_LOW, REMAIN_POINT_LOW_P, SAVE_ERR_PAGE, PROXY
+from log import logger
 import os
 import random
 import time
 
 import gevent
-import monkey
-import requests
-from bs4 import BeautifulSoup
-from config import COOKIE, FAST_SLEEP_TIME, REMAIN_POINT, REMAIN_POINT_LOW, REMAIN_POINT_LOW_P, SAVE_ERR_PAGE
-from log import logger
-import traceback
-
 url = "https://pt.keepfrds.com/blackjack.php"
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -27,10 +25,11 @@ headers = {
 
 
 def get_state(url) -> dict[str, dict]:
+    proxies = {"http": PROXY, "https": PROXY} if PROXY else None
     error = 0
     while error < 3:
         try:
-            with requests.get(url) as r:
+            with requests.get(url, proxies=proxies) as r:
                 if r.status_code == 200:
                     return r.json()
                 else:
@@ -42,10 +41,11 @@ def get_state(url) -> dict[str, dict]:
 
 
 def post_state(url, data) -> dict:
+    proxies = {"http": PROXY, "https": PROXY} if PROXY else None
     error = 0
     while error < 3:
         try:
-            with requests.post(url, data=data) as r:
+            with requests.post(url, data=data, proxies=proxies) as r:
                 if r.status_code == 200:
                     return r.json()
                 else:
@@ -55,7 +55,6 @@ def post_state(url, data) -> dict:
         except Exception as e:
             error += 1
             logger.error(f"请求错误{error}次,{e}")
-            # traceback.print_exc()
 
 
 def parse_form_from_html(soup):
