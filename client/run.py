@@ -75,11 +75,9 @@ def start_my_game():
                         post_state(STATES_URL, states)
                     else:
                         if GIFT_MODEL:
-                            data["gift_model"] = 1
                             bonus = GIFT_BONUS
                             downloads = GIFT_DOWNLOADS
                         else:
-                            data["gift_model"] = None
                             bonus = (
                                 random.randint(
                                     max(int(BONUS_MIN), 1),
@@ -91,6 +89,7 @@ def start_my_game():
                         logger.info(f"开局{bonus}魔力{downloads}下载量")
                         p = do_game(bonus, downloads, GIFT_MODEL)
                         if p:
+                            data["gift_model"] = 1 if GIFT_MODEL else None
                             data["point"] = p
                             data["bonus"] = bonus
                             data["downloads"] = downloads
