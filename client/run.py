@@ -9,6 +9,9 @@ from config import (
     NORMAL_SLEEP_TIME,
     BONUS_MIN,
     BONUS_MAX,
+    GIFT_MODEL,
+    GIFT_BONUS,
+    GIFT_DOWNLOADS,
 )
 from log import logger
 
@@ -30,15 +33,14 @@ def work_time():
 
 def random_sleep(sleep_sec):
     half_sec = sleep_sec / 2
-    gevent.sleep(random.random()*half_sec+half_sec)
+    gevent.sleep(random.random() * half_sec + half_sec)
 
 
 def post_frds_states_():
     global res_data
     global data
     state = game_state(USERID)
-    p_data = {"data": state, "userid": USERID,
-              "sleep": NORMAL_SLEEP_TIME}
+    p_data = {"data": state, "userid": USERID, "sleep": NORMAL_SLEEP_TIME}
     logger.info(f"在线游戏{state}")
     if state:
         if str(USERID) in state:
@@ -72,19 +74,29 @@ def start_my_game():
                         data["state"] = 1
                         post_state(STATES_URL, states)
                     else:
-                        bonus = random.randint(
-                            max(int(BONUS_MIN), 1), max(
-                                int(BONUS_MIN), int(BONUS_MAX), 1)
-                        )*1000
-                        logger.info(f"开局{bonus}")
-                        p = do_game(bonus)
+                        if GIFT_MODEL:
+                            data["gift_model"] = 1
+                            bonus = GIFT_BONUS
+                            downloads = GIFT_DOWNLOADS
+                        else:
+                            data["gift_model"] = None
+                            bonus = (
+                                random.randint(
+                                    max(int(BONUS_MIN), 1),
+                                    max(int(BONUS_MIN), int(BONUS_MAX), 1),
+                                )
+                                * 1000
+                            )
+                            downloads = 0
+                        logger.info(f"开局{bonus}魔力{downloads}下载量")
+                        p = do_game(bonus, downloads, GIFT_MODEL)
                         if p:
                             data["point"] = p
                             data["bonus"] = bonus
+                            data["downloads"] = downloads
                             data["state"] = 1
                             logger.info(f"上报点数{data}")
                             res_data = post_state(STATE_URL, data)
-                            # logger.info(f"更新后服务器状态{res_data}")
                         else:
                             logger.error("开局未知错误，等待重试")
             random_sleep(1)
@@ -103,35 +115,37 @@ def help_friends():
             if res_data:
                 data = res_data.get(str(USERID), data)
                 friend_need_help = [
-                    key_id for key_id in res_data
+                    key_id
+                    for key_id in res_data
                     if (
                         (key_id in res_data)
                         and (key_id != str(USERID))
                         and res_data[key_id].get("state")
+                        and (not res_data[key_id].get("gift_model"))
                         and (int(res_data[key_id].get("point", 0)) > 21)
-                    )]
+                    )
+                ]
                 if data.get("state"):
-                    # for key_id in res_data:
-                    # if key_id != str(USERID):
-                    #     friend_data = res_data.get(key_id, None)
-                    #     if friend_data:
-                    #         if friend_data.get("state", None):
-                    #             if int(friend_data.get("point", 0)) > 21:
                     if len(friend_need_help) > 0:
                         logger.info(f"服务器状态{res_data}")
                         key_id = random.choice(friend_need_help)
                         friend_data = res_data[key_id]
                         logger.info(
-                            f"好友{friend_need_help}需要帮助，随机选择{key_id}开始帮助")
+                            f"好友{friend_need_help}需要帮助，随机选择{key_id}开始帮助"
+                        )
                         bonus = friend_data.get("bonus", 100)
                         boom_data = {
-                            'game': 'hit', 'start': 'yes', 'userid': key_id, 'amount': bonus, 'downloads': '0'}
+                            "game": "hit",
+                            "start": "yes",
+                            "userid": key_id,
+                            "amount": bonus,
+                            "downloads": "0",
+                        }
                         if boom_game(boom_data, USERID):
                             logger.info(f"上传平局结果")
                             friend_data["point"] = None
                             friend_data["state"] = None
-                            res_data = post_state(
-                                url, friend_data)
+                            res_data = post_state(url, friend_data)
                         else:
                             logger.warning(f"未找到对局，等待服务器更新数据")
                             post_frds_states_()

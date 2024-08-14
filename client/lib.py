@@ -1,13 +1,21 @@
 import monkey
 import requests
 from bs4 import BeautifulSoup
-from config import COOKIE, REMAIN_POINT, REMAIN_POINT_LOW, REMAIN_POINT_LOW_P, SAVE_ERR_PAGE, PROXY
+from config import (
+    COOKIE,
+    REMAIN_POINT,
+    REMAIN_POINT_LOW,
+    REMAIN_POINT_LOW_P,
+    SAVE_ERR_PAGE,
+    PROXY,
+)
 from log import logger
 import os
 import random
 import time
 
 import gevent
+
 url = "https://pt.keepfrds.com/blackjack.php"
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -72,8 +80,7 @@ def find_game(userid):
             with requests.get(url, headers=headers) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
-                    forms = soup.select(
-                        "#game_available tr td:nth-of-type(4) form")
+                    forms = soup.select("#game_available tr td:nth-of-type(4) form")
                     for form in forms:
                         if form.find("input", value=str(userid)):
                             return parse_form_from_html(form)
@@ -90,7 +97,9 @@ def game(data):
     error = 0
     while error < 3:
         try:
-            with requests.post(url, headers=headers, data=data, proxies=proxies) as response:
+            with requests.post(
+                url, headers=headers, data=data, proxies=proxies
+            ) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     element = soup.select_one("#details b")
@@ -104,7 +113,8 @@ def game(data):
                         return point, None
                     else:
                         element = soup.select_one(
-                            "#outer table table td") or soup.select_one("form strong")
+                            "#outer table table td"
+                        ) or soup.select_one("form strong")
                         if element:
                             logger.warning(element.text)
                             return None, element.text
@@ -112,7 +122,10 @@ def game(data):
                             if SAVE_ERR_PAGE:
                                 if not os.path.exists("error_pages"):
                                     os.makedirs("error_pages")
-                                with open(f"error_pages/error_page_{int(time.time())}.html", "w") as f:
+                                with open(
+                                    f"error_pages/error_page_{int(time.time())}.html",
+                                    "w",
+                                ) as f:
                                     f.write(soup.prettify())
                                 logger.error("未知错误,已将页面保存至error_pages文件夹")
                         logger.error("未能获取到页面点数，返回None")
@@ -163,14 +176,22 @@ def boom_game(boom_data, my_userid):
         return s
 
 
-def do_game(amount=100):
-    start_data = {"game": "hit", "start": "yes",
-                  "amount": amount, "downloads": 0}
+def do_game(amount=100, downloads=0, gift_model=None):
+    start_data = {
+        "game": "hit",
+        "start": "yes",
+        "amount": amount,
+        "downloads": downloads,
+    }
     continue_data = {"game": "hit", "continue": "yes"}
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
-    remain_point = REMAIN_POINT if random.random(
-    ) > REMAIN_POINT_LOW_P else REMAIN_POINT_LOW
+    if gift_model:
+        remain_point = 21
+    else:
+        remain_point = (
+            REMAIN_POINT if random.random() > REMAIN_POINT_LOW_P else REMAIN_POINT_LOW
+        )
     s, e = game(start_data)
     if not s:
         if e == "您必须先完成当前的游戏。":
@@ -226,10 +247,14 @@ def game_state(userid):
 
 
 if __name__ == "__main__":
-    s = {'game': 'hit', 'start': 'yes', 'userid': 31341,
-         'amount': 1000, 'downloads': '0'}
-    start_data = {"game": "hit", "start": "yes",
-                  "amount": 1000, "downloads": 0}
+    s = {
+        "game": "hit",
+        "start": "yes",
+        "userid": 31341,
+        "amount": 1000,
+        "downloads": "0",
+    }
+    start_data = {"game": "hit", "start": "yes", "amount": 1000, "downloads": 0}
     hit_data = {"game": "hit", "userid": 0}
     # game(hit_data)
     print(boom_game(s, 40074))
