@@ -66,11 +66,11 @@ def start_my_game():
         if work_time():
             if not data.get("state", None):
                 logger.info(f"服务器状态{res_data}")
-                state = game_state(USERID)  # 本地校验状态
-                if state:
-                    if str(USERID) in state:
+                states = game_state(USERID)  # 本地校验状态
+                if states:
+                    if str(USERID) in states:
                         data["state"] = 1
-                        res_data = post_state(STATE_URL, data)
+                        post_state(STATES_URL, states)
                     else:
                         bonus = random.randint(
                             max(int(BONUS_MIN), 1), max(
