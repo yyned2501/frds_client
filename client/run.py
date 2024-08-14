@@ -23,7 +23,7 @@ STATES_URL = SERVER + "/api/states"
 def work_time():
     t = time.time()
     hour = (t // 3600 + 8) % 24
-    if 1 <= hour < 9:
+    if 1 <= hour < 8:
         return False
     return True
 
