@@ -9,6 +9,7 @@ from config import (
     SAVE_ERR_PAGE,
     PROXY,
     GIFT_REMAIN_POINT,
+    GIFT_BOMB_P
 )
 from log import logger
 import os
@@ -188,7 +189,7 @@ def do_game(amount=100, downloads=0, gift_model=None):
     hit_data = {"game": "hit", "userid": 0}
     stop_data = {"game": "stop", "userid": 0}
     if gift_model:
-        remain_point = GIFT_REMAIN_POINT
+        remain_point = GIFT_REMAIN_POINT if random.random() > GIFT_BOMB_P else 21
     else:
         remain_point = (
             REMAIN_POINT if random.random() > REMAIN_POINT_LOW_P else REMAIN_POINT_LOW
