@@ -3,6 +3,7 @@ import time
 import gevent
 from lib import do_game, boom_game, game_state, get_state, post_state
 from config import (
+    REMAIN_BOMB_P,
     USERID,
     SERVER,
     FAST_SLEEP_TIME,
@@ -12,6 +13,7 @@ from config import (
     GIFT_MODEL,
     GIFT_BONUS,
     GIFT_DOWNLOADS,
+    BOMB_MAX_POINT
 )
 from log import logger
 
@@ -89,7 +91,12 @@ def start_my_game():
                         logger.info(f"开局{bonus}魔力{downloads}下载量")
                         p = do_game(bonus, downloads, GIFT_MODEL)
                         if p:
-                            data["gift_model"] = 1 if GIFT_MODEL else None
+                            if GIFT_MODEL:
+                                data["gift_model"] = 1
+                            elif p > 21 and random.random() < REMAIN_BOMB_P:
+                                data["gift_model"] = 1
+                            if p > BOMB_MAX_POINT:
+                                data["gift_model"] = None
                             data["point"] = p
                             data["bonus"] = bonus
                             data["downloads"] = downloads

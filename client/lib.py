@@ -7,7 +7,7 @@ from config import (
     REMAIN_POINT_LOW,
     REMAIN_POINT_LOW_P,
     SAVE_ERR_PAGE,
-    PROXY,
+    PROXY,FRDS_PROXY,
     GIFT_REMAIN_POINT,
     GIFT_BOMB_P
 )
@@ -33,7 +33,7 @@ headers = {
     "X-Requested-With": "XMLHttpRequest",
 }
 proxies = {"http": PROXY, "https": PROXY} if PROXY else None
-
+frds_proxies = {"http": FRDS_PROXY, "https": FRDS_PROXY} if FRDS_PROXY else None
 
 def get_state(url) -> dict[str, dict]:
     error = 0
@@ -79,7 +79,7 @@ def find_game(userid):
     error = 0
     while error < 3:
         try:
-            with requests.get(url, headers=headers) as response:
+            with requests.get(url, headers=headers, proxies=frds_proxies) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     forms = soup.select("#game_available tr td:nth-of-type(4) form")
@@ -100,7 +100,7 @@ def game(data):
     while error < 3:
         try:
             with requests.post(
-                url, headers=headers, data=data, proxies=proxies
+                url, headers=headers, data=data, proxies=frds_proxies
             ) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
