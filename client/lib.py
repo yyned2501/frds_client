@@ -227,7 +227,7 @@ def game_state(userid):
     state = []
     while error < 3:
         try:
-            with requests.get(url, headers=headers, proxies=proxies) as response:
+            with requests.get(url, headers=headers, proxies=frds_proxies) as response:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "lxml")
                     inputs = soup.select(
