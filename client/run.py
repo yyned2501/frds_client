@@ -13,7 +13,7 @@ from config import (
     GIFT_MODEL,
     GIFT_BONUS,
     GIFT_DOWNLOADS,
-    BOMB_MAX_POINT
+    BOMB_MAX_POINT,
 )
 from log import logger
 
@@ -95,6 +95,8 @@ def start_my_game():
                                 data["gift_model"] = 1
                             elif p > 21 and random.random() < REMAIN_BOMB_P:
                                 data["gift_model"] = 1
+                            else:
+                                data["gift_model"] = None
                             if p > BOMB_MAX_POINT:
                                 data["gift_model"] = None
                             data["point"] = p
