@@ -1,22 +1,24 @@
 import monkey
+import os
+import random
+import time
+import traceback
 import requests
 from bs4 import BeautifulSoup
+import gevent
 from config import (
     COOKIE,
     REMAIN_POINT,
     REMAIN_POINT_LOW,
     REMAIN_POINT_LOW_P,
     SAVE_ERR_PAGE,
-    PROXY,FRDS_PROXY,
+    PROXY,
+    FRDS_PROXY,
     GIFT_REMAIN_POINT,
-    GIFT_BOMB_P
+    GIFT_BOMB_P,
 )
 from log import logger
-import os
-import random
-import time
 
-import gevent
 
 url = "https://pt.keepfrds.com/blackjack.php"
 headers = {
@@ -35,6 +37,7 @@ headers = {
 proxies = {"http": PROXY, "https": PROXY} if PROXY else None
 frds_proxies = {"http": FRDS_PROXY, "https": FRDS_PROXY} if FRDS_PROXY else None
 
+
 def get_state(url) -> dict[str, dict]:
     error = 0
     while error < 3:
@@ -48,6 +51,7 @@ def get_state(url) -> dict[str, dict]:
         except Exception as e:
             error += 1
             logger.error(f"请求错误{error}次,{e}")
+    return {}
 
 
 def post_state(url, data) -> dict:
@@ -58,12 +62,13 @@ def post_state(url, data) -> dict:
                 if r.status_code == 200:
                     return r.json()
                 else:
-                    logger.error(r.status_code)
-            error += 1
-            logger.error(f"请求错误{error}次,错误代码{r.status_code}")
+                    error += 1
+                    logger.error(f"请求错误{error}次,错误代码{r.status_code}")
         except Exception as e:
             error += 1
             logger.error(f"请求错误{error}次,{e}")
+            traceback.print_exc()
+    return {}
 
 
 def parse_form_from_html(soup):
