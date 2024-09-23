@@ -67,6 +67,7 @@ def post_state(url, data) -> dict:
         except Exception as e:
             error += 1
             logger.error(f"请求错误{error}次,{e}")
+            logger.error(f"错误数据{data}")
             traceback.print_exc()
     return {}
 
